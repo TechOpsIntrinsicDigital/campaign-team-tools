@@ -4544,6 +4544,7 @@ function resetForm(){
        ========================================================= -->
 
   <template id="geofenceCounterTemplate">
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -4561,7 +4562,7 @@ function resetForm(){
     :root {
   --cyan: #123b63;
   --orange: #e9660a;
-  --ink: #333;
+      --ink: #333;
       --line: #e5e7eb;
       --soft-pink: #ffe8e8;
       --soft-blue: #e9fbff;
@@ -4835,8 +4836,8 @@ function resetForm(){
     }
 
     table {
-      width: 100%;
-      min-width: 1200px;
+      width: max-content;
+      min-width: 100%;
       border-collapse: separate;
       border-spacing: 0;
       table-layout: auto;
@@ -4844,15 +4845,21 @@ function resetForm(){
     }
 
     th {
-      display: none;
-    }
-
-    th:first-child {
-      border-top-left-radius: 10px;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      padding: 10px 11px;
+      background: #f4fbfc;
+      color: var(--orange);
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      font-size: 11px;
+      font-weight: 700;
+      text-align: left;
+      white-space: nowrap;
     }
 
     th:last-child {
-      border-top-right-radius: 10px;
       border-right: none;
     }
 
@@ -4868,6 +4875,7 @@ function resetForm(){
       vertical-align: middle;
       white-space: normal;
       overflow-wrap: anywhere;
+      min-width: 90px;
     }
 
     tbody tr:nth-child(even) td {
@@ -4904,25 +4912,6 @@ function resetForm(){
     th:nth-child(2),
     td:nth-child(2) {
       min-width: 300px;
-    }
-
-    th:nth-child(3),
-    td:nth-child(3),
-    th:nth-child(4),
-    td:nth-child(4),
-    th:nth-child(5),
-    td:nth-child(5),
-    th:nth-child(6),
-    td:nth-child(6),
-    th:nth-child(7),
-    td:nth-child(7),
-    th:nth-child(8),
-    td:nth-child(8),
-    th:nth-child(9),
-    td:nth-child(9),
-    th:nth-child(10),
-    td:nth-child(10) {
-      min-width: 90px;
     }
 
     .empty-row td {
@@ -5363,7 +5352,7 @@ function resetForm(){
       </h1>
 
       <p class="subtitle">
-        Select your package, paste your TapClicks data, and instantly see how many geofences you are using and how many remain available.
+        Select your package, paste your TapClicks export, and instantly see how many geofences you are using and how many remain available.
       </p>
 
     </div>
@@ -5529,7 +5518,7 @@ function resetForm(){
 
 
       <div class="paste-header-right">
-        Pipe delimited
+        Paste like Excel
       </div>
 
     </div>
@@ -5537,12 +5526,11 @@ function resetForm(){
 
     <div class="paste-content">
 
-
       <div class="table-wrapper">
 
         <table id="TapClicksTable">
 
-          <thead>
+          <thead id="topClicksHead">
 
             <tr>
 
@@ -5795,16 +5783,29 @@ function resetForm(){
   let campaignGroups = {};
   let activeCampaign = null;
 
-
-  const topClicksTable =
-    document.getElementById(
-      "topClicksTable"
-    );
+  let pastedHeaders = [
+    "Geo Fence",
+    "Campaign",
+    "Impressions",
+    "CPM",
+    "Clicks",
+    "CTR",
+    "CPC",
+    "Total Cost",
+    "Walk Ins",
+    "Cost Per Walk In"
+  ];
 
 
   const topClicksBody =
     document.getElementById(
       "topClicksBody"
+    );
+
+
+  const topClicksHead =
+    document.getElementById(
+      "topClicksHead"
     );
 
 
@@ -5881,58 +5882,243 @@ function resetForm(){
 
 
   /* =========================================================
-     TAPCLICKS PARSER
+     CLIPBOARD PARSING
      ========================================================= */
 
-  function parseTapClicksPipeRow(line) {
+  function parseClipboardHTML(html) {
 
-    const rawFields =
-      line.split("|");
-
-    let fields =
-      rawFields.map(field =>
-        normalizeField(field)
-      );
-
-    if (
-      fields.length > 0 &&
-      fields[0] === ""
-    ) {
-      fields.shift();
+    if (!html) {
+      return null;
     }
 
-    if (
-      fields.length > 0 &&
-      fields[fields.length - 1] === ""
-    ) {
-      fields.pop();
-    }
+    const parser =
+      new DOMParser();
 
-    fields =
-      fields.map(field =>
-        normalizeField(field)
+    const doc =
+      parser.parseFromString(
+        html,
+        "text/html"
       );
 
-    return fields;
+    const sourceTable =
+      doc.querySelector("table");
+
+    if (!sourceTable) {
+      return null;
+    }
+
+    const sourceRows =
+      Array.from(
+        sourceTable.querySelectorAll("tr")
+      );
+
+    if (!sourceRows.length) {
+      return null;
+    }
+
+    const grid = [];
+
+    sourceRows.forEach(sourceRow => {
+
+      const cells =
+        Array.from(
+          sourceRow.querySelectorAll(
+            "th, td"
+          )
+        );
+
+      if (!cells.length) {
+        return;
+      }
+
+      const row =
+        cells.map(cell =>
+          normalizeField(
+            cell.innerText ||
+            cell.textContent ||
+            ""
+          )
+        );
+
+      grid.push(row);
+
+    });
+
+    return grid.length
+      ? grid
+      : null;
 
   }
 
 
-  function isSeparatorRow(fields) {
+  function parseClipboardText(text) {
 
-    if (!fields.length) {
+    if (!text || !text.trim()) {
+      return null;
+    }
+
+    const lines =
+      text
+        .replace(/\r\n/g, "\n")
+        .replace(/\r/g, "\n")
+        .split("\n");
+
+    const rows = [];
+
+    lines.forEach(line => {
+
+      if (!line.trim()) {
+        return;
+      }
+
+      /*
+       * IMPORTANT:
+       *
+       * Clipboard data copied from Excel/Top Clicks
+       * is normally TAB separated.
+       *
+       * We split on TAB first.
+       *
+       * We DO NOT treat the pipe character as
+       * another column when tabs already exist.
+       */
+
+      if (line.includes("\t")) {
+
+        rows.push(
+          line
+            .split("\t")
+            .map(value =>
+              normalizeField(value)
+            )
+        );
+
+        return;
+
+      }
+
+      /*
+       * Fallback for plain pipe-delimited
+       * TapClicks text.
+       */
+
+      if (line.includes("|")) {
+
+        let fields =
+          line
+            .split("|")
+            .map(value =>
+              normalizeField(value)
+            );
+
+        /*
+         * Remove only the visual pipe boundaries.
+         *
+         * Example:
+         *
+         * | Geo Fence | Campaign | Clicks |
+         *
+         * becomes:
+         *
+         * Geo Fence | Campaign | Clicks
+         */
+
+        if (
+          fields.length &&
+          fields[0] === ""
+        ) {
+          fields.shift();
+        }
+
+        if (
+          fields.length &&
+          fields[fields.length - 1] === ""
+        ) {
+          fields.pop();
+        }
+
+        rows.push(fields);
+
+      }
+
+    });
+
+    return rows.length
+      ? rows
+      : null;
+
+  }
+
+
+  function getClipboardGrid(
+    clipboard
+  ) {
+
+    /*
+     * First choice:
+     * Use the actual HTML table from
+     * Excel / Top Clicks.
+     *
+     * This preserves the real columns.
+     */
+
+    const html =
+      clipboard.getData(
+        "text/html"
+      );
+
+    const htmlGrid =
+      parseClipboardHTML(
+        html
+      );
+
+    if (
+      htmlGrid &&
+      htmlGrid.length
+    ) {
+
+      return htmlGrid;
+
+    }
+
+
+    /*
+     * Second choice:
+     * Use plain text.
+     *
+     * Excel normally gives us
+     * TAB separated values here.
+     */
+
+    const text =
+      clipboard.getData(
+        "text/plain"
+      );
+
+    return parseClipboardText(
+      text
+    );
+
+  }
+
+
+  function isSeparatorRow(row) {
+
+    if (!row.length) {
       return true;
     }
 
-    return fields.every(field => {
+    return row.every(value => {
 
-      const value =
-        String(field || "")
+      const cleaned =
+        String(value || "")
           .replace(/\s/g, "");
 
       return (
-        value === "" ||
-        /^:?-+:?$/.test(value)
+        cleaned === "" ||
+        /^:?-+:?$/.test(
+          cleaned
+        )
       );
 
     });
@@ -5940,170 +6126,435 @@ function resetForm(){
   }
 
 
-  function isExcelExtraColumn(fields) {
+  function isHeaderRow(row) {
 
-    if (fields.length < 11) {
+    if (!row.length) {
       return false;
     }
 
-    const possibleGeoFence =
+    const first =
       normalizeField(
-        fields[1]
-      );
+        row[0]
+      ).toLowerCase();
 
-    const possibleCampaign =
+    const second =
       normalizeField(
-        fields[2]
-      );
-
-    const possibleImpressions =
-      normalizeField(
-        fields[3]
-      );
-
-    if (
-      !possibleGeoFence ||
-      !possibleCampaign
-    ) {
-      return false;
-    }
-
-    const impressionValue =
-      possibleImpressions
-        .replace(/,/g, "")
-        .trim();
+        row[1] || ""
+      ).toLowerCase();
 
     return (
-      /^\d+(?:\.\d+)?$/.test(
-        impressionValue
-      )
+      (
+        first === "geo fence" ||
+        first === "geofence"
+      ) &&
+      second === "campaign"
     );
 
   }
 
 
-  function parseEntireClipboard(text) {
+  /*
+   * Keeps the first two columns in their
+   * correct positions and allows every
+   * additional pasted column to remain
+   * exactly where it came from.
+   */
+
+  function normalizePastedGrid(
+    grid
+  ) {
 
     if (
-      !text ||
-      !text.trim()
+      !grid ||
+      !grid.length
     ) {
-      return [];
+      return {
+        headers: [],
+        rows: []
+      };
     }
 
-    const lines =
-      text
-        .replace(/\r\n/g, "\n")
-        .replace(/\r/g, "\n")
-        .split("\n")
-        .filter(line =>
-          line.trim() !== ""
-        );
+    let rows =
+      grid.map(row =>
+        row.map(value =>
+          normalizeField(value)
+        )
+      );
 
-    const rows = [];
 
-    for (const line of lines) {
+    /*
+     * Remove completely empty rows.
+     */
 
-      if (!line.includes("|")) {
-        continue;
-      }
+    rows =
+      rows.filter(row =>
+        row.some(value =>
+          normalizeField(value) !== ""
+        )
+      );
 
-      let fields =
-        parseTopClicksPipeRow(line);
 
-      if (!fields.length) {
-        continue;
-      }
+    /*
+     * Remove separator rows.
+     */
+
+    rows =
+      rows.filter(row =>
+        !isSeparatorRow(row)
+      );
+
+
+    if (!rows.length) {
+      return {
+        headers: [],
+        rows: []
+      };
+    }
+
+
+    /*
+     * If Top Clicks included its header,
+     * keep it as the visible table header.
+     */
+
+    let headers = null;
+
+    if (
+      isHeaderRow(
+        rows[0]
+      )
+    ) {
+
+      headers =
+        rows.shift();
+
+    }
+
+
+    if (!headers) {
+
+      headers = [
+        "Geo Fence",
+        "Campaign",
+        "Impressions",
+        "CPM",
+        "Clicks",
+        "CTR",
+        "CPC",
+        "Total Cost",
+        "Walk Ins",
+        "Cost Per Walk In"
+      ];
+
+    }
+
+
+    /*
+     * Find the widest actual pasted row.
+     */
+
+    let columnCount =
+      headers.length;
+
+    rows.forEach(row => {
 
       if (
-        isSeparatorRow(fields)
-      ) {
-        continue;
-      }
-
-      if (
-        isExcelExtraColumn(fields)
+        row.length >
+        columnCount
       ) {
 
-        fields =
-          fields.slice(1);
+        columnCount =
+          row.length;
 
       }
 
-      if (!fields.length) {
-        continue;
-      }
+    });
 
-      const first =
-        normalizeField(fields[0])
-          .toLowerCase();
 
-      if (
-        first === "geo fence" ||
-        first === "geofence"
-      ) {
-        continue;
-      }
+    /*
+     * Expand headers to match
+     * the actual pasted grid.
+     */
 
-      if (fields.length < 2) {
-        continue;
-      }
+    while (
+      headers.length <
+      columnCount
+    ) {
 
-      rows.push({
+      headers.push(
+        `Column ${headers.length + 1}`
+      );
 
-        geoFence:
-          normalizeField(
-            fields[0]
-          ),
+    }
 
-        campaign:
-          normalizeField(
-            fields[1]
-          ),
 
-        impressions:
-          normalizeField(
-            fields[2] || ""
-          ),
+    /*
+     * Every row gets exactly the
+     * same number of cells.
+     *
+     * This is the part that makes
+     * the table behave like Excel.
+     */
 
-        cpm:
-          normalizeField(
-            fields[3] || ""
-          ),
+    rows =
+      rows.map(row => {
 
-        clicks:
-          normalizeField(
-            fields[4] || ""
-          ),
+        const copy =
+          row.slice(
+            0,
+            columnCount
+          );
 
-        ctr:
-          normalizeField(
-            fields[5] || ""
-          ),
+        while (
+          copy.length <
+          columnCount
+        ) {
 
-        cpc:
-          normalizeField(
-            fields[6] || ""
-          ),
+          copy.push("");
 
-        totalCost:
-          normalizeField(
-            fields[7] || ""
-          ),
+        }
 
-        walkIns:
-          normalizeField(
-            fields[8] || ""
-          ),
-
-        costPerWalkIn:
-          normalizeField(
-            fields[9] || ""
-          )
+        return copy;
 
       });
 
-    }
+
+    return {
+      headers:
+        headers.slice(
+          0,
+          columnCount
+        ),
+
+      rows:
+        rows
+    };
+
+  }
+
+
+  /* =========================================================
+     TABLE RENDERING
+     ========================================================= */
+
+  function renderTableHeaders(
+    headers
+  ) {
+
+    topClicksHead.innerHTML = "";
+
+    const tr =
+      document.createElement(
+        "tr"
+      );
+
+    headers.forEach(
+      header => {
+
+        const th =
+          document.createElement(
+            "th"
+          );
+
+        th.textContent =
+          normalizeField(
+            header
+          );
+
+        tr.appendChild(
+          th
+        );
+
+      }
+    );
+
+    topClicksHead.appendChild(
+      tr
+    );
+
+  }
+
+
+  function renderTableRows(
+    rows
+  ) {
+
+    topClicksBody.innerHTML = "";
+
+    rows.forEach(
+      row => {
+
+        const tr =
+          document.createElement(
+            "tr"
+          );
+
+        row.forEach(
+          value => {
+
+            const td =
+              document.createElement(
+                "td"
+              );
+
+            td.contentEditable =
+              "true";
+
+            td.textContent =
+              normalizeField(
+                value
+              );
+
+            tr.appendChild(
+              td
+            );
+
+          }
+        );
+
+        topClicksBody.appendChild(
+          tr
+        );
+
+      }
+    );
+
+  }
+
+
+  function createEmptyTable() {
+
+    pastedHeaders = [
+      "Geo Fence",
+      "Campaign",
+      "Impressions",
+      "CPM",
+      "Clicks",
+      "CTR",
+      "CPC",
+      "Total Cost",
+      "Walk Ins",
+      "Cost Per Walk In"
+    ];
+
+    renderTableHeaders(
+      pastedHeaders
+    );
+
+    topClicksBody.innerHTML = `
+
+      <tr class="empty-row">
+
+        ${pastedHeaders
+          .map(
+            () =>
+              `<td contenteditable="true"></td>`
+          )
+          .join("")}
+
+      </tr>
+
+    `;
+
+  }
+
+
+  /* =========================================================
+     CONVERT PASTED GRID TO INTERNAL ROWS
+     ========================================================= */
+
+  function gridToParsedRows(
+    grid
+  ) {
+
+    const rows = [];
+
+    grid.forEach(
+      row => {
+
+        if (
+          row.length < 2
+        ) {
+          return;
+        }
+
+        const geoFence =
+          normalizeField(
+            row[0] || ""
+          );
+
+        const campaign =
+          normalizeField(
+            row[1] || ""
+          );
+
+        /*
+         * The calculation only needs
+         * Geo Fence and Campaign.
+         *
+         * The remaining columns stay
+         * visible in the table.
+         */
+
+        if (
+          !geoFence ||
+          !campaign
+        ) {
+          return;
+        }
+
+        rows.push({
+
+          geoFence:
+            geoFence,
+
+          campaign:
+            campaign,
+
+          impressions:
+            normalizeField(
+              row[2] || ""
+            ),
+
+          cpm:
+            normalizeField(
+              row[3] || ""
+            ),
+
+          clicks:
+            normalizeField(
+              row[4] || ""
+            ),
+
+          ctr:
+            normalizeField(
+              row[5] || ""
+            ),
+
+          cpc:
+            normalizeField(
+              row[6] || ""
+            ),
+
+          totalCost:
+            normalizeField(
+              row[7] || ""
+            ),
+
+          walkIns:
+            normalizeField(
+              row[8] || ""
+            ),
+
+          costPerWalkIn:
+            normalizeField(
+              row[9] || ""
+            )
+
+        });
+
+      }
+    );
 
     return rows;
 
@@ -6114,12 +6565,19 @@ function resetForm(){
      PASTE HANDLING
      ========================================================= */
 
-  function populateTableFromPaste(text) {
+  function populateTableFromPaste(
+    clipboard
+  ) {
 
-    const rows =
-      parseEntireClipboard(text);
+    const grid =
+      getClipboardGrid(
+        clipboard
+      );
 
-    if (!rows.length) {
+    if (
+      !grid ||
+      !grid.length
+    ) {
 
       showMessage(
         "No usable TapClicks rows were found in the pasted data.",
@@ -6130,66 +6588,79 @@ function resetForm(){
 
     }
 
-    parsedRows = rows;
 
-    topClicksBody.innerHTML = "";
+    const normalized =
+      normalizePastedGrid(
+        grid
+      );
 
-    rows.forEach(row => {
 
-      const tr =
-        document.createElement("tr");
+    if (
+      !normalized.rows.length
+    ) {
 
-      const values = [
+      showMessage(
+        "No usable TapClicks rows were found in the pasted data.",
+        "error"
+      );
 
-        cleanDisplayName(
-          row.geoFence
-        ),
+      return;
 
-        cleanDisplayName(
-          row.campaign
-        ),
+    }
 
-        row.impressions,
 
-        row.cpm,
+    /*
+     * Save the actual pasted
+     * column structure.
+     */
 
-        row.clicks,
+    pastedHeaders =
+      normalized.headers;
 
-        row.ctr,
 
-        row.cpc,
+    /*
+     * Draw the exact number
+     * of columns that were pasted.
+     */
 
-        row.totalCost,
+    renderTableHeaders(
+      pastedHeaders
+    );
 
-        row.walkIns,
+    renderTableRows(
+      normalized.rows
+    );
 
-        row.costPerWalkIn
 
-      ];
+    /*
+     * Convert the first two columns
+     * into the data used by the
+     * Geofence Counter.
+     */
 
-      values.forEach(value => {
+    parsedRows =
+      gridToParsedRows(
+        normalized.rows
+      );
 
-        const td =
-          document.createElement("td");
 
-        td.contentEditable =
-          "true";
+    if (!parsedRows.length) {
 
-        td.textContent =
-          normalizeField(value);
+      showMessage(
+        "The pasted data needs at least Geo Fence and Campaign columns.",
+        "error"
+      );
 
-        tr.appendChild(td);
+      return;
 
-      });
+    }
 
-      topClicksBody.appendChild(tr);
-
-    });
 
     showMessage(
-      `${rows.length} rows pasted successfully.`,
+      `${normalized.rows.length} rows pasted successfully.`,
       "success"
     );
+
 
     calculateResults();
 
@@ -6207,26 +6678,58 @@ function resetForm(){
         return;
       }
 
+
+      const hasHTML =
+        clipboard.types &&
+        clipboard.types.includes(
+          "text/html"
+        );
+
       const text =
         clipboard.getData(
           "text/plain"
         );
 
+
       if (
-        !text ||
-        !text.trim()
+        !hasHTML &&
+        (
+          !text ||
+          !text.trim()
+        )
       ) {
         return;
       }
 
-      if (!text.includes("|")) {
+
+      /*
+       * Only intercept paste when
+       * it actually looks like table data.
+       */
+
+      const looksLikeTable =
+        hasHTML ||
+        (
+          text &&
+          (
+            text.includes("\t") ||
+            text.includes("|")
+          )
+        );
+
+
+      if (!looksLikeTable) {
         return;
       }
+
 
       event.preventDefault();
       event.stopPropagation();
 
-      populateTableFromPaste(text);
+
+      populateTableFromPaste(
+        clipboard
+      );
 
     },
     true
@@ -6248,68 +6751,79 @@ function resetForm(){
         )
       );
 
-    trs.forEach(tr => {
 
-      const cells =
-        Array.from(
-          tr.querySelectorAll(
-            "td"
-          )
-        );
+    trs.forEach(
+      tr => {
 
-      if (cells.length !== 10) {
-        return;
+        const cells =
+          Array.from(
+            tr.querySelectorAll(
+              "td"
+            )
+          );
+
+
+        if (
+          cells.length < 2
+        ) {
+          return;
+        }
+
+
+        const values =
+          cells.map(
+            cell =>
+              normalizeField(
+                cell.textContent
+              )
+          );
+
+
+        if (
+          !values[0] ||
+          !values[1]
+        ) {
+          return;
+        }
+
+
+        rows.push({
+
+          geoFence:
+            values[0],
+
+          campaign:
+            values[1],
+
+          impressions:
+            values[2] || "",
+
+          cpm:
+            values[3] || "",
+
+          clicks:
+            values[4] || "",
+
+          ctr:
+            values[5] || "",
+
+          cpc:
+            values[6] || "",
+
+          totalCost:
+            values[7] || "",
+
+          walkIns:
+            values[8] || "",
+
+          costPerWalkIn:
+            values[9] || ""
+
+        });
+
       }
+    );
 
-      const values =
-        cells.map(cell =>
-          normalizeField(
-            cell.textContent
-          )
-        );
-
-      if (
-        !values[0] ||
-        !values[1]
-      ) {
-        return;
-      }
-
-      rows.push({
-
-        geoFence:
-          values[0],
-
-        campaign:
-          values[1],
-
-        impressions:
-          values[2],
-
-        cpm:
-          values[3],
-
-        clicks:
-          values[4],
-
-        ctr:
-          values[5],
-
-        cpc:
-          values[6],
-
-        totalCost:
-          values[7],
-
-        walkIns:
-          values[8],
-
-        costPerWalkIn:
-          values[9]
-
-      });
-
-    });
 
     return rows;
 
@@ -6320,7 +6834,9 @@ function resetForm(){
      CAMPAIGN LOGIC
      ========================================================= */
 
-  function getParentCampaign(campaign) {
+  function getParentCampaign(
+    campaign
+  ) {
 
     const value =
       normalizeField(
@@ -6332,6 +6848,7 @@ function resetForm(){
       "_Employer-POI"
     ];
 
+
     for (
       const suffix of suffixes
     ) {
@@ -6341,7 +6858,10 @@ function resetForm(){
           suffix
         );
 
-      if (index !== -1) {
+
+      if (
+        index !== -1
+      ) {
 
         return value.substring(
           0,
@@ -6352,6 +6872,7 @@ function resetForm(){
       }
 
     }
+
 
     return value;
 
@@ -6366,6 +6887,7 @@ function resetForm(){
       getParentCampaign(
         campaign
       );
+
 
     return (
       campaign !== parent &&
@@ -6384,47 +6906,65 @@ function resetForm(){
     const map =
       new Map();
 
-    rows.forEach(row => {
 
-      const displayName =
-        cleanDisplayName(
-          row.geoFence
-        );
+    rows.forEach(
+      row => {
 
-const key =
-  cleanGeofenceName(
-    displayName
-  );
+        const displayName =
+          cleanDisplayName(
+            row.geoFence
+          );
 
-if (
-  !key ||
-  displayName.trim().toLowerCase() === "unknown"
-) {
-  return;
-}
 
-      if (!map.has(key)) {
+        const key =
+          cleanGeofenceName(
+            displayName
+          );
 
-        map.set(
-          key,
-          {
-            key: key,
-            displayName:
-              displayName,
-            rows: [row]
-          }
-        );
 
-      } else {
+        if (!key) {
+          return;
+        }
 
-        map
-          .get(key)
-          .rows
-          .push(row);
+
+        /*
+         * Unknown should never
+         * count as a geofence.
+         */
+
+        if (
+          key === "unknown"
+        ) {
+          return;
+        }
+
+
+        if (
+          !map.has(key)
+        ) {
+
+          map.set(
+            key,
+            {
+              key: key,
+              displayName:
+                displayName,
+              rows: [row]
+            }
+          );
+
+        } else {
+
+          map
+            .get(key)
+            .rows
+            .push(row);
+
+        }
 
       }
+    );
 
-    });
 
     return map;
 
@@ -6437,69 +6977,80 @@ if (
 
     const groups = {};
 
-    rows.forEach(row => {
 
-      const campaign =
-        cleanDisplayName(
-          row.campaign
-        );
+    rows.forEach(
+      row => {
 
-      if (!campaign) {
-        return;
+        const campaign =
+          cleanDisplayName(
+            row.campaign
+          );
+
+
+        if (!campaign) {
+          return;
+        }
+
+
+        const parent =
+          getParentCampaign(
+            campaign
+          );
+
+
+        if (!groups[parent]) {
+
+          groups[parent] = {
+
+            campaign:
+              parent,
+
+            rows: [],
+
+            isolatedRows: [],
+
+            allRows: []
+
+          };
+
+        }
+
+
+        if (
+          isIsolationCampaign(
+            campaign
+          )
+        ) {
+
+          groups[parent]
+            .isolatedRows
+            .push(row);
+
+        } else {
+
+          groups[parent]
+            .rows
+            .push(row);
+
+        }
+
       }
+    );
 
-      const parent =
-        getParentCampaign(
-          campaign
-        );
-
-      if (!groups[parent]) {
-
-        groups[parent] = {
-
-          campaign:
-            parent,
-
-          rows: [],
-
-          isolatedRows: [],
-
-          allRows: []
-
-        };
-
-      }
-
-      if (
-        isIsolationCampaign(
-          campaign
-        )
-      ) {
-
-        groups[parent]
-          .isolatedRows
-          .push(row);
-
-      } else {
-
-        groups[parent]
-          .rows
-          .push(row);
-
-      }
-
-    });
 
     Object.values(
       groups
-    ).forEach(group => {
+    ).forEach(
+      group => {
 
-      group.allRows = [
-        ...group.rows,
-        ...group.isolatedRows
-      ];
+        group.allRows = [
+          ...group.rows,
+          ...group.isolatedRows
+        ];
 
-    });
+      }
+    );
+
 
     return groups;
 
@@ -6513,6 +7064,7 @@ if (
     const map =
       new Map();
 
+
     group.allRows.forEach(
       row => {
 
@@ -6521,26 +7073,28 @@ if (
             row.geoFence
           );
 
-const key =
-  cleanGeofenceName(
-    displayName
-  );
 
-if (
-  !key ||
-  displayName.trim().toLowerCase() === "unknown"
-) {
-  return;
-}
-if (
-  /(^|_)Event(_|$)/i.test(
-    displayName
-  )
-) {
-  return;
-}
+        const key =
+          cleanGeofenceName(
+            displayName
+          );
 
-        if (!map.has(key)) {
+
+        if (!key) {
+          return;
+        }
+
+
+        if (
+          key === "unknown"
+        ) {
+          return;
+        }
+
+
+        if (
+          !map.has(key)
+        ) {
 
           map.set(
             key,
@@ -6556,6 +7110,7 @@ if (
       }
     );
 
+
     return map;
 
   }
@@ -6570,12 +7125,20 @@ if (
     const tableRows =
       readTableRows();
 
-    if (tableRows.length) {
+
+    if (
+      tableRows.length
+    ) {
+
       parsedRows =
         tableRows;
+
     }
 
-    if (!parsedRows.length) {
+
+    if (
+      !parsedRows.length
+    ) {
 
       showMessage(
         "Please paste your TapClicks data first.",
@@ -6586,10 +7149,12 @@ if (
 
     }
 
+
     campaignGroups =
       buildCampaignGroups(
         parsedRows
       );
+
 
     updateSummary();
     renderCampaignTabs();
@@ -6609,30 +7174,36 @@ if (
         parsedRows
       );
 
+
     document.getElementById(
       "rowsEntered"
     ).textContent =
       parsedRows.length;
+
 
     document.getElementById(
       "uniqueGeofences"
     ).textContent =
       unique.size;
 
+
     const additional =
       document.getElementById(
         "additionalAvailable"
       );
+
 
     const additionalCard =
       document.getElementById(
         "additionalAvailableCard"
       );
 
+
     const unlimited =
       document.getElementById(
         "unlimitedMessage"
       );
+
 
     if (
       selectedLimit === Infinity
@@ -6641,16 +7212,20 @@ if (
       additional.textContent =
         "∞";
 
+
       additional.className =
         "summary-value green";
+
 
       additionalCard.classList.remove(
         "red-card"
       );
 
+
       additionalCard.classList.add(
         "green-card"
       );
+
 
       unlimited.style.display =
         "block";
@@ -6661,17 +7236,23 @@ if (
         selectedLimit -
         unique.size;
 
+
       additional.textContent =
         available;
 
-      if (available < 0) {
+
+      if (
+        available < 0
+      ) {
 
         additional.className =
           "summary-value red";
 
+
         additionalCard.classList.remove(
           "green-card"
         );
+
 
         additionalCard.classList.add(
           "red-card"
@@ -6682,15 +7263,18 @@ if (
         additional.className =
           "summary-value green";
 
+
         additionalCard.classList.remove(
           "red-card"
         );
+
 
         additionalCard.classList.add(
           "green-card"
         );
 
       }
+
 
       unlimited.style.display =
         "none";
@@ -6711,16 +7295,22 @@ if (
         "campaignTabs"
       );
 
+
     tabs.innerHTML = "";
+
 
     const campaigns =
       Object.keys(
         campaignGroups
       );
 
-    if (!campaigns.length) {
+
+    if (
+      !campaigns.length
+    ) {
       return;
     }
+
 
     if (
       !activeCampaign ||
@@ -6734,6 +7324,7 @@ if (
 
     }
 
+
     campaigns.forEach(
       campaign => {
 
@@ -6742,8 +7333,10 @@ if (
             "button"
           );
 
+
         button.type =
           "button";
+
 
         button.className =
           "campaign-tab" +
@@ -6754,8 +7347,10 @@ if (
               : ""
           );
 
+
         button.textContent =
           campaign;
+
 
         button.addEventListener(
           "click",
@@ -6764,11 +7359,13 @@ if (
             activeCampaign =
               campaign;
 
+
             renderCampaignTabs();
             renderCampaignResults();
 
           }
         );
+
 
         tabs.appendChild(
           button
@@ -6791,7 +7388,10 @@ if (
         "campaignResults"
       );
 
-    if (!parsedRows.length) {
+
+    if (
+      !parsedRows.length
+    ) {
 
       container.innerHTML = `
 
@@ -6805,16 +7405,21 @@ if (
 
       `;
 
+
       return;
 
     }
+
 
     const campaigns =
       Object.keys(
         campaignGroups
       );
 
-    if (!campaigns.length) {
+
+    if (
+      !campaigns.length
+    ) {
 
       container.innerHTML = `
 
@@ -6828,9 +7433,11 @@ if (
 
       `;
 
+
       return;
 
     }
+
 
     if (!activeCampaign) {
 
@@ -6839,24 +7446,29 @@ if (
 
     }
 
+
     const group =
       campaignGroups[
         activeCampaign
       ];
 
+
     if (!group) {
       return;
     }
+
 
     const unique =
       getCampaignUniqueGeofences(
         group
       );
 
+
     const names =
       Array.from(
         unique.values()
       );
+
 
     let html = `
 
@@ -6871,6 +7483,7 @@ if (
         <span class="campaign-result-header-count">
 
           ${names.length}
+
           ${
             names.length === 1
               ? "geofence"
@@ -6883,7 +7496,10 @@ if (
 
     `;
 
-    if (!names.length) {
+
+    if (
+      !names.length
+    ) {
 
       html += `
 
@@ -6927,6 +7543,7 @@ if (
 
     }
 
+
     container.innerHTML =
       html;
 
@@ -6937,7 +7554,9 @@ if (
      ESCAPE HTML
      ========================================================= */
 
-  function escapeHtml(value) {
+  function escapeHtml(
+    value
+  ) {
 
     return String(
       value || ""
@@ -6980,15 +7599,19 @@ if (
         "pasteMessage"
       );
 
+
     message.textContent =
       text;
+
 
     message.className =
       `message show ${type}`;
 
+
     clearTimeout(
       showMessage.timer
     );
+
 
     showMessage.timer =
       setTimeout(
@@ -7012,49 +7635,57 @@ if (
     .querySelectorAll(
       ".package-option"
     )
-    .forEach(card => {
+    .forEach(
+      card => {
 
-      card.addEventListener(
-        "click",
-        () => {
+        card.addEventListener(
+          "click",
+          () => {
 
-          document
-            .querySelectorAll(
-              ".package-option"
-            )
-            .forEach(item =>
-              item.classList.remove(
-                "active"
+            document
+              .querySelectorAll(
+                ".package-option"
               )
+              .forEach(
+                item =>
+                  item.classList.remove(
+                    "active"
+                  )
+              );
+
+
+            card.classList.add(
+              "active"
             );
 
-          card.classList.add(
-            "active"
-          );
 
-          selectedPackage =
-            card.dataset.package;
+            selectedPackage =
+              card.dataset.package;
 
-          selectedLimit =
-            card.dataset.limit ===
-            "Infinity"
-              ? Infinity
-              : Number(
-                  card.dataset.limit
-                );
 
-          document.getElementById(
-            "selectedPackageLabel"
-          ).textContent =
-            selectedPackage;
+            selectedLimit =
+              card.dataset.limit ===
+              "Infinity"
+                ? Infinity
+                : Number(
+                    card.dataset.limit
+                  );
 
-          updateSummary();
-          renderCampaignResults();
 
-        }
-      );
+            document.getElementById(
+              "selectedPackageLabel"
+            ).textContent =
+              selectedPackage;
 
-    });
+
+            updateSummary();
+            renderCampaignResults();
+
+          }
+        );
+
+      }
+    );
 
 
   /* =========================================================
@@ -7085,24 +7716,7 @@ if (
 
         activeCampaign = null;
 
-        topClicksBody.innerHTML = `
-
-          <tr class="empty-row">
-
-            <td contenteditable="true"></td>
-            <td contenteditable="true"></td>
-            <td contenteditable="true"></td>
-            <td contenteditable="true"></td>
-            <td contenteditable="true"></td>
-            <td contenteditable="true"></td>
-            <td contenteditable="true"></td>
-            <td contenteditable="true"></td>
-            <td contenteditable="true"></td>
-            <td contenteditable="true"></td>
-
-          </tr>
-
-        `;
+        createEmptyTable();
 
 
         document.getElementById(
@@ -7187,12 +7801,15 @@ if (
      INITIAL STATE
      ========================================================= */
 
+  createEmptyTable();
+
   updateSummary();
 
 </script>
 
 </body>
 </html>
+```
   </template>
 
 
