@@ -1,0 +1,7254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Campaign Team Tools</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --main-blue: #123b63;
+      --aqua: #79c0c3;
+      --orange: #e9660a;
+      --soft-blue: #e9fbff;
+      --soft-pink: #ffe8e8;
+      --ink: #333;
+      --line: #e5e7eb;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      min-height: 100%;
+      font-family: 'Quicksand', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(
+        135deg,
+        #e9fbff 0%,
+        #fef6ee 100%
+      );
+    }
+
+    .page-header {
+      width: 100%;
+      padding: 22px 28px 16px;
+      text-align: center;
+    }
+
+    .page-header h1 {
+      margin: 0;
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--main-blue);
+      letter-spacing: .4px;
+    }
+
+    .page-header h1 span {
+      color: var(--orange);
+    }
+
+    .tabs {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      border-bottom: 2px solid var(--aqua);
+    }
+
+    .tab-button {
+      border: none;
+      border-radius: 14px 14px 0 0;
+      padding: 15px 12px;
+      background: #e5e7eb;
+      color: #555;
+      font-family: 'Quicksand', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: .2s;
+    }
+
+    .tab-button:hover {
+      background: #dce3e5;
+      color: var(--main-blue);
+    }
+
+    .tab-button.active {
+      background: #fff;
+      color: var(--orange);
+    }
+
+    .tool-panel {
+      display: none;
+      width: 100%;
+      min-height: calc(100vh - 130px);
+    }
+
+    .tool-panel.active {
+      display: block;
+    }
+
+    .tool-frame {
+      display: block;
+      width: 100%;
+      min-height: calc(100vh - 130px);
+      height: calc(100vh - 130px);
+      border: 0;
+      margin: 0;
+      padding: 0;
+      background: transparent;
+    }
+
+    @media (max-width: 800px) {
+      .tabs {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .page-header {
+        padding: 16px 12px 12px;
+      }
+
+      .page-header h1 {
+        font-size: 26px;
+      }
+
+      .tab-button {
+        font-size: 13px;
+        padding: 13px 6px;
+      }
+
+      .tool-frame {
+        min-height: calc(100vh - 110px);
+        height: calc(100vh - 110px);
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="page-header">
+    <h1>Campaign Team <span>Tools</span></h1>
+  </div>
+
+  <div class="tabs">
+
+    <button
+      class="tab-button active"
+      onclick="showTool('calcito', this)"
+    >
+      Calcito
+    </button>
+
+<button
+  class="tab-button"
+  onclick="showTool('event-campaign-tool', this)"
+>
+  Event Campaign Tool
+</button>
+
+    <button
+      class="tab-button"
+      onclick="showTool('pixel-checker', this)"
+    >
+      Pixel Checker
+    </button>
+
+    <button
+      class="tab-button"
+      onclick="showTool('geofence-counter', this)"
+    >
+      Geofence Counter
+    </button>
+
+  </div>
+
+
+  <!-- =========================================================
+       CALCITO
+       ========================================================= -->
+
+  <div id="calcito" class="tool-panel active">
+
+    <iframe
+      id="calcitoFrame"
+      class="tool-frame"
+      title="Calcito"
+    ></iframe>
+
+  </div>
+
+
+  <!-- =========================================================
+       EVENT CAMPAIGN TOOL
+       ========================================================= -->
+
+  <div id="event-campaign-tool" class="tool-panel">
+
+    <iframe
+      id="eventConverterFrame"
+      class="tool-frame"
+      title="Event Campaign Tool"
+    ></iframe>
+
+  </div>
+
+  <!-- =========================================================
+       PIXEL CHECKER
+       ========================================================= -->
+
+  <div id="pixel-checker" class="tool-panel">
+
+    <iframe
+      id="pixelCheckerFrame"
+      class="tool-frame"
+      title="Pixel Checker"
+    ></iframe>
+
+  </div>
+
+  <!-- =========================================================
+       GEOFENCE COUNTER
+       ========================================================= -->
+
+  <div id="geofence-counter" class="tool-panel">
+
+    <iframe
+      id="geofenceCounterFrame"
+      class="tool-frame"
+      title="Geofence Counter"
+    ></iframe>
+
+  </div>
+
+
+  <!-- =========================================================
+       CALCITO TEMPLATE
+       ========================================================= -->
+
+  <template id="calcitoTemplate">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Calcito</title>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --main-blue: #123b63;
+      --aqua: #79c0c3;
+      --orange: #e9660a;
+      --bg-light: #fefeff;
+      --bg-soft: #f0f7f8;
+      --shadow: rgba(0, 0, 0, 0.08);
+    }
+
+    body, input, select, textarea, button, .results {
+      font-family: 'Quicksand', sans-serif !important;
+      background: linear-gradient(135deg, #e9fbff 0%, #fef6ee 100%);
+      padding: 1.5rem;
+      color: var(--main-blue);
+      font-size: 1rem;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 3rem;
+      font-weight: 700;
+      margin: 0.3rem 0 0.5rem;
+      letter-spacing: 1px;
+    }
+
+    h1 span:first-child { color: var(--main-blue); }
+    h1 span:last-child { color: var(--orange); }
+
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      margin-top: 0.5rem;
+      align-items: flex-start;
+    }
+
+    .left, .right {
+      flex: 1 1 400px;
+    }
+
+    .section-box {
+      border-radius: 15px;
+      padding: 1rem 1.2rem;
+      margin-bottom: 1rem;
+      background-color: var(--bg-soft);
+      box-shadow: 0 3px 10px var(--shadow);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+
+    .section-title {
+      font-size: 1.2rem;
+      color: var(--orange);
+      margin-bottom: 0.6rem;
+      font-weight: 600;
+      border-bottom: 2px solid var(--aqua);
+      padding-bottom: 0.3rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.25rem;
+      font-weight: 500;
+      font-size: 0.95rem;
+      color: var(--main-blue);
+    }
+
+    input[type='number'], select {
+      width: 98%;
+      padding: 0.45rem 0.6rem;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: 1px solid #cce5e7;
+      background: white;
+      margin-bottom: 0.75rem;
+      color: #333;
+      box-shadow: none;
+    }
+
+    .inline-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .inline-row button {
+      padding: 0.4rem 0.9rem;
+      font-size: 0.95rem;
+      background: linear-gradient(145deg, var(--aqua), #8ed5d7);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 6px var(--shadow);
+    }
+
+    .inline-row input[type='number'] {
+      width: 100%;
+      flex: 1;
+      margin: 0;
+    }
+
+    .results {
+      background-color: #ffffff;
+      border-radius: 12px;
+      padding: 1.5rem 2rem;
+      box-shadow: 0 3px 12px var(--shadow);
+      font-size: 0.95rem;
+    }
+
+    .results div {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.9rem;
+      line-height: 1.3;
+      gap: 1rem;
+    }
+
+    .highlight {
+      font-weight: 600;
+      color: var(--main-blue);
+      font-size: 0.96rem;
+    }
+
+    .value {
+      font-weight: 600;
+      color: #333;
+      font-size: 0.95rem;
+      min-width: 120px;
+      text-align: right;
+    }
+
+    .results::before {
+      content: 'Budgets';
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--orange);
+      display: block;
+      margin-bottom: 0.8rem;
+      text-align: left;
+    }
+
+    .top-center {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    .top-center input {
+      padding: 0.5rem;
+      font-size: 1.1rem;
+      width: 220px;
+      border-radius: 10px;
+      border: 1px solid #a7d2d4;
+      background: white;
+      color: #333;
+      text-align: center;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.06);
+    }
+
+    .buttons-row {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .big-button {
+      flex: 1;
+      padding: 1rem;
+      font-size: 1.05rem;
+      background: linear-gradient(145deg, var(--aqua), #7dd2d4);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 3px 10px var(--shadow);
+      transition: all 0.2s ease;
+    }
+
+    .big-button:hover { background: #5aaeb1; }
+
+    #resetBtn {
+      background: linear-gradient(145deg, #e9660a, #f2863d);
+    }
+
+    #resetBtn:hover { background: #cc5a08; }
+  </style>
+</head>
+
+<body>
+
+  <h1><span>Cal</span><span>cito</span></h1>
+
+  <div class="top-center">
+    <label for="packageBudget">Total Package Budget $:</label>
+    <input type="number" id="packageBudget" placeholder="Enter budget" />
+  </div>
+
+  <div class="container">
+
+    <div class="left">
+
+      <div class="section-box">
+        <div class="section-title">Main Campaigns</div>
+
+        <label>Competitor Resident Geofences</label>
+        <input type="number" id="compTargets" />
+
+        <label>Employer Geofences</label>
+        <input type="number" id="empTargets" />
+
+        <label>POI Geofences</label>
+        <input type="number" id="poiTargets" />
+
+        <label>Emp-POI / Isolation 1</label>
+        <input type="number" id="combinedTargets" />
+
+        <label>Isolation 2</label>
+        <input type="number" id="isolation2Targets" />
+
+        <label>Other Campaign Geofences</label>
+        <input type="number" id="otherTargets" />
+
+        <label>Competitor-Resident Streaming TV</label>
+
+        <div class="inline-row">
+          <button type="button" onclick="calculateCompTV()">Calculate</button>
+          <input type="number" id="compStreamingTV" />
+        </div>
+
+        <label>Hulu Competitor-Resident Streaming TV</label>
+
+        <div class="inline-row">
+          <button type="button" onclick="calculateHuluCompTV()">Calculate</button>
+          <input type="number" id="huluCompTVBudget" />
+        </div>
+
+      </div>
+
+
+      <div class="section-box">
+
+        <div class="section-title">Addressable Campaigns</div>
+
+        <label for="includeAddressable">Addressable Campaign</label>
+
+        <select id="includeAddressable">
+          <option value="no">No</option>
+          <option value="yes">Yes</option>
+        </select>
+
+        <label>Addressable Streaming TV</label>
+
+        <div class="inline-row">
+          <button type="button" onclick="calculateAddrTV()">Calculate</button>
+          <input type="number" id="addressableTVBudget" />
+        </div>
+
+        <label>Hulu Addressable Streaming TV</label>
+
+        <div class="inline-row">
+          <button type="button" onclick="calculateHuluAddrTV()">Calculate</button>
+          <input type="number" id="huluAddrTVBudget" />
+        </div>
+
+      </div>
+
+
+      <div class="section-box">
+
+        <div class="section-title">Retargeting Campaigns</div>
+
+        <label>Site Retargeting ($)</label>
+        <input type="number" id="siteRetargeting" />
+
+        <label>Search Retargeting ($)</label>
+        <input type="number" id="searchRetargeting" />
+
+      </div>
+
+
+      <div class="section-box">
+
+        <div class="section-title">ReTV Campaigns</div>
+
+        <label for="retvTier">ReTV Tier:</label>
+
+        <select id="retvTier">
+          <option value="0">None</option>
+          <option value="1">Tier 1 $130</option>
+          <option value="2">Tier 2 $260</option>
+          <option value="3">Tier 3 $390</option>
+          <option value="4">Tier 4 $520</option>
+        </select>
+
+      </div>
+
+    </div>
+
+
+    <div class="right">
+
+      <div class="results" id="results"></div>
+
+      <div class="buttons-row">
+        <button class="big-button" onclick="calculateBudgets()">Calculate</button>
+        <button class="big-button" id="resetBtn" onclick="resetAll()">Reset</button>
+      </div>
+
+    </div>
+
+  </div>
+
+
+<script>
+
+function round2(num) {
+  return Math.round(num*100)/100;
+}
+
+function calculateCompTV() {
+  const totalBudget = parseFloat(document.getElementById('packageBudget').value) || 0;
+  const huluComp = parseFloat(document.getElementById('huluCompTVBudget').value);
+  const compTV = (!isNaN(huluComp) && huluComp>0) ? totalBudget*0.15 : totalBudget*0.3;
+  document.getElementById('compStreamingTV').value = round2(compTV);
+}
+
+function calculateHuluCompTV() {
+  const totalBudget = parseFloat(document.getElementById('packageBudget').value) || 0;
+  document.getElementById('huluCompTVBudget').value = round2(totalBudget*0.15);
+  calculateCompTV();
+}
+
+function calculateAddrTV() {
+  const totalBudget = parseFloat(document.getElementById('packageBudget').value) || 0;
+  const addrBudget = totalBudget*0.5;
+  const huluVal = parseFloat(document.getElementById('huluAddrTVBudget').value)||0;
+  const addrTV = round2(addrBudget*0.5 - huluVal);
+  document.getElementById('addressableTVBudget').value = addrTV>0 ? addrTV:0;
+  document.getElementById('includeAddressable').value = 'yes';
+}
+
+function calculateHuluAddrTV() {
+  const addrVal = parseFloat(document.getElementById('addressableTVBudget').value)||0;
+  document.getElementById('huluAddrTVBudget').value = round2(addrVal*0.5);
+  calculateAddrTV();
+}
+
+function calculateBudgets() {
+
+  const total = parseFloat(document.getElementById('packageBudget').value)||0;
+
+  const site = parseFloat(document.getElementById('siteRetargeting').value)||0;
+  const search = parseFloat(document.getElementById('searchRetargeting').value)||0;
+  const retargetingTotal = site + search;
+
+  const comp = +document.getElementById('compTargets').value||0;
+  const emp = +document.getElementById('empTargets').value||0;
+  const poi = +document.getElementById('poiTargets').value||0;
+  const comb = +document.getElementById('combinedTargets').value||0;
+  const iso2 = +document.getElementById('isolation2Targets').value||0;
+  const other = +document.getElementById('otherTargets').value||0;
+
+  const totalTargets = comp+emp+poi+comb+iso2+other||1;
+
+  const retvTier = +document.getElementById('retvTier').value;
+
+  let retv = 0, huluRetv = 0;
+
+  if(retvTier===1) [retv,huluRetv]=[95,35];
+  else if(retvTier===2) [retv,huluRetv]=[190,70];
+  else if(retvTier===3) [retv,huluRetv]=[285,105];
+  else if(retvTier===4) [retv,huluRetv]=[380,140];
+
+  const compTV = +document.getElementById('compStreamingTV').value||0;
+  const huluComp = +document.getElementById('huluCompTVBudget').value||0;
+
+  const addrYes = document.getElementById('includeAddressable').value==='yes';
+  const addrTV = +document.getElementById('addressableTVBudget').value||0;
+  const huluAddr = +document.getElementById('huluAddrTVBudget').value||0;
+
+  const addr = addrYes ? total*0.5 - addrTV - huluAddr : 0;
+
+  const remaining = Math.max(
+    total -
+    retargetingTotal -
+    compTV -
+    huluComp -
+    addr -
+    addrTV -
+    huluAddr,
+    0
+  );
+
+  let resultsHTML = '';
+
+  resultsHTML += `
+    <div>
+      <span class="highlight">Total Package Budget:</span>
+      <span class="value">$${round2(total)}</span>
+    </div>
+  `;
+
+  if(retvTier>0){
+
+    resultsHTML += `
+      <div>
+        <span class="highlight">ReTV Add-on:</span>
+        <span class="value">$${round2(retv+huluRetv)}</span>
+      </div>
+    `;
+
+    resultsHTML += `
+      <div>
+        <span class="highlight">Total Budget:</span>
+        <span class="value">$${round2(total+(retv+huluRetv))}</span>
+      </div>
+    `;
+
+    resultsHTML += `<hr/>`;
+  }
+
+  if(site>0)
+    resultsHTML += `
+      <div>
+        <span class="highlight">Site Retargeting:</span>
+        <span class="value">$${round2(site)}</span>
+      </div>
+    `;
+
+  if(search>0)
+    resultsHTML += `
+      <div>
+        <span class="highlight">Search Retargeting:</span>
+        <span class="value">$${round2(search)}</span>
+      </div>
+    `;
+
+  if(compTV>0)
+    resultsHTML += `
+      <div>
+        <span class="highlight">Competitor Resident Streaming TV:</span>
+        <span class="value">$${round2(compTV)}</span>
+      </div>
+    `;
+
+  if(huluComp>0)
+    resultsHTML += `
+      <div>
+        <span class="highlight">Hulu Competitor Resident Streaming TV:</span>
+        <span class="value">$${round2(huluComp)}</span>
+      </div>
+    `;
+
+  if(addrYes && addr>0)
+    resultsHTML += `
+      <div>
+        <span class="highlight">Addressable Campaign:</span>
+        <span class="value">$${round2(addr)}</span>
+      </div>
+    `;
+
+  if(addrTV>0)
+    resultsHTML += `
+      <div>
+        <span class="highlight">Addressable Streaming TV:</span>
+        <span class="value">$${round2(addrTV)}</span>
+      </div>
+    `;
+
+  if(huluAddr>0)
+    resultsHTML += `
+      <div>
+        <span class="highlight">Hulu Addressable Streaming TV:</span>
+        <span class="value">$${round2(huluAddr)}</span>
+      </div>
+    `;
+
+  if(retv>0)
+    resultsHTML += `
+      <div>
+        <span class="highlight">ReTV:</span>
+        <span class="value">$${round2(retv)}</span>
+      </div>
+    `;
+
+  if(huluRetv>0)
+    resultsHTML += `
+      <div>
+        <span class="highlight">Hulu ReTV:</span>
+        <span class="value">$${round2(huluRetv)}</span>
+      </div>
+    `;
+
+  if((comp+emp+poi+comb+iso2+other)>0 && remaining>0){
+
+    resultsHTML += `<hr/>`;
+
+    if(comp>0)
+      resultsHTML += `
+        <div>
+          <span class="highlight">Competitor Resident Geofences:</span>
+          <span class="value">$${round2((remaining*comp)/totalTargets)}</span>
+        </div>
+      `;
+
+    if(emp>0)
+      resultsHTML += `
+        <div>
+          <span class="highlight">Employer Geofences:</span>
+          <span class="value">$${round2((remaining*emp)/totalTargets)}</span>
+        </div>
+      `;
+
+    if(poi>0)
+      resultsHTML += `
+        <div>
+          <span class="highlight">POI Geofences:</span>
+          <span class="value">$${round2((remaining*poi)/totalTargets)}</span>
+        </div>
+      `;
+
+    if(comb>0)
+      resultsHTML += `
+        <div>
+          <span class="highlight">Emp-POI / Isolation 1:</span>
+          <span class="value">$${round2((remaining*comb)/totalTargets)}</span>
+        </div>
+      `;
+
+    if(iso2>0)
+      resultsHTML += `
+        <div>
+          <span class="highlight">Isolation 2 Geofences:</span>
+          <span class="value">$${round2((remaining*iso2)/totalTargets)}</span>
+        </div>
+      `;
+
+    if(other>0)
+      resultsHTML += `
+        <div>
+          <span class="highlight">Other Campaign Geofences:</span>
+          <span class="value">$${round2((remaining*other)/totalTargets)}</span>
+        </div>
+      `;
+  }
+
+  document.getElementById('results').innerHTML = resultsHTML;
+}
+
+function resetAll(){
+
+  document.querySelectorAll('input, select').forEach(el =>
+    el.value =
+      el.tagName==='SELECT'
+        ? el.options[0].value
+        : ''
+  );
+
+  document.getElementById('results').innerHTML='';
+}
+
+</script>
+
+  </template>
+
+
+  <!-- =========================================================
+       EVENT CAMPAIGN TOOL TEMPLATE
+       ========================================================= -->
+
+  <template id="eventCampaignToolTemplate">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Event Campaign Time Converter</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --cyan: #79c0c3;
+      --orange: #e9660a;
+      --ink: #111827;
+      --line: #e5e7eb;
+      --err: #b91c1c;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Quicksand', sans-serif;
+      background: linear-gradient(135deg, #e9fbff 0%, #fef6ee 100%);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      margin: 0;
+      padding: 40px;
+      color: var(--ink);
+    }
+
+    .tools-wrapper {
+      display: flex;
+      gap: 24px;
+      width: 100%;
+      max-width: 980px;
+      align-items: flex-start;
+    }
+
+    .container {
+      background: #fff;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, .12);
+      width: 100%;
+      text-align: center;
+    }
+
+    .converter-container {
+      flex: 1.15;
+      min-width: 470px;
+    }
+
+    .budget-container {
+      flex: 1;
+      min-width: 350px;
+    }
+
+    h2 {
+      margin: 0 0 25px;
+      font-weight: 700;
+      color: var(--orange);
+      font-size: 24px;
+      letter-spacing: .3px;
+    }
+
+    .converter-container h2 {
+      white-space: nowrap;
+    }
+
+    label {
+      font-weight: 600;
+      display: block;
+      margin-bottom: 6px;
+      font-size: 14px;
+      color: var(--ink);
+      text-align: left;
+    }
+
+    input[type="time"],
+    input[type="date"],
+    input[type="text"],
+    input[type="number"],
+    input[disabled],
+    select {
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      font-size: 14px;
+      width: 100%;
+      box-sizing: border-box;
+      margin-bottom: 12px;
+      font-family: 'Quicksand', sans-serif;
+      transition: 0.2s;
+      text-align: center;
+      background: #fff;
+      color: var(--ink);
+    }
+
+    input[type="time"]:focus,
+    input[type="date"]:focus,
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    select:focus {
+      border-color: var(--orange);
+      box-shadow: 0 2px 6px rgba(233, 102, 10, 0.25);
+      outline: none;
+    }
+
+    input[disabled] {
+      background: #f9fafb;
+      color: #555;
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .row > div {
+      flex: 1;
+    }
+
+    .budget-row {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .budget-row > div {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .hint {
+      color: #555;
+      font-size: 12px;
+      text-align: left;
+      margin-top: -8px;
+      margin-bottom: 8px;
+      opacity: .75;
+    }
+
+    .switch {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 14px 0;
+      font-size: 14px;
+      color: var(--ink);
+      cursor: pointer;
+      justify-content: flex-start;
+    }
+
+    .switch input {
+      display: none;
+    }
+
+    .slider {
+      position: relative;
+      width: 50px;
+      height: 26px;
+      background-color: var(--line);
+      border-radius: 20px;
+      transition: 0.3s;
+      flex-shrink: 0;
+    }
+
+    .slider::before {
+      content: "";
+      position: absolute;
+      height: 20px;
+      width: 20px;
+      left: 3px;
+      top: 3px;
+      background: white;
+      border-radius: 50%;
+      transition: 0.3s;
+    }
+
+    .switch input:checked + .slider {
+      background-color: var(--orange);
+    }
+
+    .switch input:checked + .slider::before {
+      transform: translateX(24px);
+    }
+
+    button {
+      margin-top: 12px;
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      font-weight: 700;
+      background: var(--orange);
+      border: none;
+      border-radius: 10px;
+      color: white;
+      cursor: pointer;
+      transition: 0.2s;
+      font-family: 'Quicksand', sans-serif;
+      letter-spacing: .3px;
+    }
+
+    button:hover {
+      background: #cf5609;
+    }
+
+    .result {
+      margin-top: 16px;
+      font-size: 15px;
+      color: var(--ink);
+      text-align: left;
+      display: none;
+      border: 2px solid var(--line);
+      border-radius: 12px;
+      padding: 16px;
+      background: #fff;
+    }
+
+    .result strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--cyan);
+    }
+
+    .budget-result {
+      border-color: var(--cyan);
+      line-height: 1.5;
+    }
+
+    .budget-result .budget-message {
+      margin-bottom: 14px;
+    }
+
+    .budget-result .budget-total {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--orange);
+    }
+
+    .error {
+      color: var(--err);
+      font-size: 12px;
+      text-align: left;
+      margin-top: -4px;
+      margin-bottom: 8px;
+    }
+
+    .muted {
+      color: #777;
+    }
+
+    #resetBtn,
+    #budgetResetBtn {
+      display: none;
+      margin-top: 10px;
+      background: #fff;
+      color: var(--orange);
+      border: 1px solid var(--orange);
+    }
+
+    #resetBtn:hover,
+    #budgetResetBtn:hover {
+      background: #fff6ef;
+    }
+
+    .other-campaign {
+      display: none;
+    }
+
+    .currency-input {
+      position: relative;
+    }
+
+    .currency-symbol {
+      position: absolute;
+      left: 12px;
+      top: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #555;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .currency-input input {
+      padding-left: 28px;
+    }
+
+    @media (max-width: 900px) {
+      body {
+        padding: 20px;
+      }
+
+      .tools-wrapper {
+        flex-direction: column;
+        max-width: 600px;
+      }
+
+      .converter-container,
+      .budget-container {
+        width: 100%;
+        min-width: 0;
+      }
+
+      .converter-container h2 {
+        white-space: normal;
+      }
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 15px;
+      }
+
+      .container {
+        padding: 22px;
+      }
+
+      h2 {
+        font-size: 21px;
+      }
+
+      .row {
+        flex-direction: column;
+        gap: 0;
+      }
+
+      .row > div {
+        width: 100%;
+      }
+
+      .budget-row {
+        flex-direction: column;
+        gap: 0;
+      }
+
+      .budget-row > div {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="tools-wrapper">
+
+    <!-- ========================================= -->
+    <!-- EVENT CAMPAIGN TIME CONVERTER             -->
+    <!-- ========================================= -->
+
+    <div class="container converter-container">
+
+      <h2>Event Campaign Time Converter</h2>
+
+      <!-- ZIP or Postal and detected TZ -->
+      <div class="row">
+
+        <div>
+          <label>ZIP or Postal Code US or CA</label>
+
+          <input
+            type="text"
+            id="zipCode"
+            placeholder="e.g. 90210 or M5V 2T6"
+          >
+
+          <div
+            id="zipError"
+            class="error"
+            style="display:none;"
+          ></div>
+        </div>
+
+        <div>
+          <label>Detected Time Zone</label>
+
+          <input
+            id="tzDisplay"
+            value="-"
+            disabled
+          />
+        </div>
+
+      </div>
+
+      <div class="hint">
+        Works for US ZIP five digits and Canadian postal codes like A1A 1A1.
+      </div>
+
+      <!-- Date range -->
+      <label>Original Date Range</label>
+
+      <div class="row">
+
+        <div>
+          <input type="date" id="startDate">
+        </div>
+
+        <div>
+          <input type="date" id="endDate">
+        </div>
+
+      </div>
+
+      <!-- Time range -->
+      <label>Original Time Range</label>
+
+      <div class="row">
+
+        <div>
+          <input type="time" id="startTime" value="12:00">
+        </div>
+
+        <div>
+          <input type="time" id="endTime" value="16:00">
+        </div>
+
+      </div>
+
+      <!-- Buffer -->
+      <label class="switch">
+
+        <input type="checkbox" id="buffer">
+
+        <span class="slider"></span>
+
+        <span>
+          Add buffer
+          <span class="muted">
+            1 hour before and after
+          </span>
+        </span>
+
+      </label>
+
+      <button
+        id="convertBtn"
+        onclick="convertToCST()"
+      >
+        Convert to CST
+      </button>
+
+      <div
+        class="result"
+        id="result"
+      ></div>
+
+      <button
+        id="resetBtn"
+        onclick="resetForm()"
+      >
+        Reset
+      </button>
+
+    </div>
+
+
+    <!-- ========================================= -->
+    <!-- EVENT CAMPAIGN BUDGET                     -->
+    <!-- ========================================= -->
+
+    <div class="container budget-container">
+
+      <h2>Event Campaign Budget</h2>
+
+      <!-- Total Campaign Budget and Total Event Budget -->
+      <div class="budget-row">
+
+        <div>
+          <label for="totalCampaignBudget">
+            Total Campaign Budget
+          </label>
+
+          <div class="currency-input">
+
+            <span class="currency-symbol">$</span>
+
+            <input
+              type="number"
+              id="totalCampaignBudget"
+              placeholder="e.g. 500"
+              min="0"
+              step="0.01"
+            >
+
+          </div>
+        </div>
+
+
+        <div>
+          <label for="totalEventBudget">
+            Total Event Budget
+          </label>
+
+          <div class="currency-input">
+
+            <span class="currency-symbol">$</span>
+
+            <input
+              type="number"
+              id="totalEventBudget"
+              placeholder="e.g. 10"
+              min="0"
+              step="0.01"
+            >
+
+          </div>
+        </div>
+
+      </div>
+
+
+      <!-- Budget Source Month -->
+      <label for="billingMonth">
+        Budget Source Month
+      </label>
+
+      <select id="billingMonth">
+
+        <option value="">
+          Select month
+        </option>
+
+        <option value="January">January</option>
+        <option value="February">February</option>
+        <option value="March">March</option>
+        <option value="April">April</option>
+        <option value="May">May</option>
+        <option value="June">June</option>
+        <option value="July">July</option>
+        <option value="August">August</option>
+        <option value="September">September</option>
+        <option value="October">October</option>
+        <option value="November">November</option>
+        <option value="December">December</option>
+
+      </select>
+
+
+      <!-- Campaign Where Budget Was Taken From -->
+      <label for="budgetSource">
+        Campaign Where Budget Was Taken From
+      </label>
+
+      <select
+        id="budgetSource"
+        onchange="handleBudgetSource()"
+      >
+
+        <option value="">
+          Select campaign
+        </option>
+
+        <option value="Competitor Resident">
+          Competitor Resident
+        </option>
+
+        <option value="Employer">
+          Employer
+        </option>
+
+        <option value="POI">
+          POI
+        </option>
+
+        <option value="Other">
+          Other
+        </option>
+
+      </select>
+
+
+      <!-- Other Campaign -->
+      <div
+        class="other-campaign"
+        id="otherCampaignWrapper"
+      >
+
+        <label for="otherCampaign">
+          Campaign Name
+        </label>
+
+        <input
+          type="text"
+          id="otherCampaign"
+          placeholder="Enter campaign name"
+        >
+
+      </div>
+
+
+      <!-- Event Campaign End Date -->
+      <label for="eventEndDate">
+        Event Campaign End Date
+      </label>
+
+      <input
+        type="date"
+        id="eventEndDate"
+      >
+
+
+      <!-- Calculate -->
+      <button
+        id="calculateBudgetBtn"
+        onclick="calculateBudget()"
+      >
+        Show Results
+      </button>
+
+
+      <!-- Budget Result -->
+      <div
+        class="result budget-result"
+        id="budgetResult"
+      ></div>
+
+
+      <!-- Budget Reset -->
+      <button
+        id="budgetResetBtn"
+        onclick="resetBudgetForm()"
+      >
+        Reset
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <script>
+
+    /* =====================================================
+       TIME ZONE HELPERS AND VALIDATION
+       ===================================================== */
+
+    const offsets = {
+      EST: -5,
+      CST: -6,
+      MST: -7,
+      PST: -8,
+      AKST: -9,
+      HST: -10,
+      AST: -4,
+      NST: -3.5
+    };
+
+
+    const US_STATE_DEFAULT_TZ = {
+      AL:"CST",
+      AK:"AKST",
+      AZ:"MST",
+      AR:"CST",
+      CA:"PST",
+      CO:"MST",
+      CT:"EST",
+      DC:"EST",
+      DE:"EST",
+      FL:"EST",
+      GA:"EST",
+      HI:"HST",
+      IA:"CST",
+      ID:"MST",
+      IL:"CST",
+      IN:"EST",
+      KS:"CST",
+      KY:"EST",
+      LA:"CST",
+      MA:"EST",
+      MD:"EST",
+      ME:"EST",
+      MI:"EST",
+      MN:"CST",
+      MO:"CST",
+      MS:"CST",
+      MT:"MST",
+      NC:"EST",
+      ND:"CST",
+      NE:"CST",
+      NH:"EST",
+      NJ:"EST",
+      NM:"MST",
+      NV:"PST",
+      NY:"EST",
+      OH:"EST",
+      OK:"CST",
+      OR:"PST",
+      PA:"EST",
+      RI:"EST",
+      SC:"EST",
+      SD:"CST",
+      TN:"CST",
+      TX:"CST",
+      UT:"MST",
+      VA:"EST",
+      VT:"EST",
+      WA:"PST",
+      WI:"CST",
+      WV:"EST",
+      WY:"MST",
+      PR:"AST"
+    };
+
+
+    const CA_PROV_DEFAULT_TZ = {
+      NL:"NST",
+      NS:"AST",
+      PE:"AST",
+      NB:"AST",
+      QC:"EST",
+      ON:"EST",
+      MB:"CST",
+      SK:"CST",
+      AB:"MST",
+      BC:"PST",
+      YT:"MST",
+      NT:"MST",
+      NU:"EST"
+    };
+
+
+    const ZIP_EXCEPTIONS_TZ = [
+      {range:[324,325], tz:"CST"},
+      {range:[463,464], tz:"CST"},
+      {range:[476,477], tz:"CST"},
+      {range:[498,499], tz:"CST"},
+      {range:[586,588], tz:"MST"},
+      {range:[693,693], tz:"MST"},
+      {range:[577,577], tz:"MST"},
+      {range:[979,979], tz:"MST"},
+      {range:[838,838], tz:"PST"},
+      {range:[835,835], tz:"PST"},
+      {range:[798,799], tz:"MST"},
+      {range:[885,885], tz:"MST"},
+      {range:[376,385], tz:"EST"}
+    ];
+
+
+    function refineCanadaTZ(prov, lon) {
+
+      if (!isFinite(lon)) {
+        return CA_PROV_DEFAULT_TZ[prov] || "EST";
+      }
+
+      if (prov === "ON" && lon < -90) {
+        return "CST";
+      }
+
+      if (prov === "BC" && lon > -121) {
+        return "MST";
+      }
+
+      if (prov === "NU" && lon < -95) {
+        return "CST";
+      }
+
+      return CA_PROV_DEFAULT_TZ[prov] || "EST";
+    }
+
+
+    const US_ZIP_RE =
+      /^\d{5}(?:-\d{4})?$/i;
+
+
+    const CA_POSTAL_RE =
+      /^[ABCEGHJ-NPRSTVXY]\d[ABCEGHJ-NPRSTV-Z][\s-]?\d[ABCEGHJ-NPRSTV-Z]\d$/i;
+
+
+    function zip3(zip5) {
+      return parseInt(zip5.slice(0, 3), 10);
+    }
+
+
+    function checkUSExceptions(zip5) {
+
+      const z3 = zip3(zip5);
+
+      for (const ex of ZIP_EXCEPTIONS_TZ) {
+
+        if (
+          z3 >= ex.range[0] &&
+          z3 <= ex.range[1]
+        ) {
+          return ex.tz;
+        }
+
+      }
+
+      return null;
+    }
+
+
+    async function detectTimezoneFromInput() {
+
+      const zipInput =
+        document.getElementById('zipCode').value.trim();
+
+      const tzBox =
+        document.getElementById('tzDisplay');
+
+      const errBox =
+        document.getElementById('zipError');
+
+
+      errBox.style.display = "none";
+      tzBox.value = "-";
+
+
+      if (!zipInput) {
+
+        errBox.textContent =
+          "Please enter a ZIP or postal code.";
+
+        errBox.style.display = "block";
+
+        return null;
+      }
+
+
+      try {
+
+        if (US_ZIP_RE.test(zipInput)) {
+
+          const zip5 =
+            zipInput.replace(/-.+$/, "");
+
+          const res =
+            await fetch(
+              `https://api.zippopotam.us/us/${zip5}`
+            );
+
+
+          if (res.ok) {
+
+            const data =
+              await res.json();
+
+            const state =
+              (
+                data.places?.[0]?.[
+                  'state abbreviation'
+                ] || ""
+              ).toUpperCase();
+
+
+            const exTz =
+              checkUSExceptions(zip5);
+
+
+            const tz =
+              exTz ||
+              (US_STATE_DEFAULT_TZ[state] || "EST");
+
+
+            tzBox.value = tz;
+
+            return tz;
+          }
+        }
+
+
+        if (CA_POSTAL_RE.test(zipInput)) {
+
+          const postal =
+            zipInput
+              .toUpperCase()
+              .replace(/\s+/g, "");
+
+
+          const res =
+            await fetch(
+              `https://api.zippopotam.us/ca/${postal}`
+            );
+
+
+          if (res.ok) {
+
+            const data =
+              await res.json();
+
+
+            const prov =
+              (
+                data.places?.[0]?.[
+                  'state abbreviation'
+                ] || ""
+              ).toUpperCase();
+
+
+            const lon =
+              parseFloat(
+                data.places?.[0]?.longitude
+              );
+
+
+            const tz =
+              refineCanadaTZ(prov, lon);
+
+
+            tzBox.value = tz;
+
+            return tz;
+          }
+        }
+
+
+        errBox.textContent =
+          "Invalid or unsupported code. Try another US ZIP or Canadian postal code.";
+
+        errBox.style.display = "block";
+
+        return null;
+
+      } catch (e) {
+
+        errBox.textContent =
+          "Lookup failed. Please try again.";
+
+        errBox.style.display = "block";
+
+        return null;
+      }
+    }
+
+
+    document
+      .getElementById('zipCode')
+      .addEventListener(
+        'blur',
+        detectTimezoneFromInput
+      );
+
+
+    document
+      .getElementById('zipCode')
+      .addEventListener(
+        'keyup',
+        (e) => {
+
+          if (e.key === 'Enter') {
+            detectTimezoneFromInput();
+          }
+
+        }
+      );
+
+
+    /* =====================================================
+       DATE AND TIME MATH
+       ===================================================== */
+
+    function parseTimeToMinutes(t) {
+
+      const [h, m] =
+        t.split(":").map(Number);
+
+      return h * 60 + m;
+    }
+
+
+    function formatClock(mins) {
+
+      mins =
+        ((mins % 1440) + 1440) % 1440;
+
+      const h24 =
+        Math.floor(mins / 60);
+
+      const m =
+        mins % 60;
+
+      const ampm =
+        h24 >= 12 ? "PM" : "AM";
+
+      const h12 =
+        (h24 % 12) || 12;
+
+      return `${h12}:${String(m).padStart(2, '0')} ${ampm}`;
+    }
+
+
+    function parseISODate(iso) {
+
+      const [y, m, d] =
+        iso.split("-").map(Number);
+
+      return new Date(
+        Date.UTC(y, m - 1, d)
+      );
+    }
+
+
+    function addDays(dateObj, days) {
+
+      const d =
+        new Date(dateObj.getTime());
+
+      d.setUTCDate(
+        d.getUTCDate() + days
+      );
+
+      return d;
+    }
+
+
+    function formatISODateUTC(dateObj) {
+
+      const y =
+        dateObj.getUTCFullYear();
+
+      const m =
+        String(
+          dateObj.getUTCMonth() + 1
+        ).padStart(2, '0');
+
+      const d =
+        String(
+          dateObj.getUTCDate()
+        ).padStart(2, '0');
+
+      return `${y}-${m}-${d}`;
+    }
+
+
+    function daysBetweenISO(a, b) {
+
+      const A = parseISODate(a);
+      const B = parseISODate(b);
+
+      const msPerDay = 86400000;
+
+      return Math.round(
+        (B - A) / msPerDay
+      );
+    }
+
+
+    function splitDay(totalMinutes) {
+
+      const dayOffset =
+        Math.floor(totalMinutes / 1440);
+
+      let mins =
+        totalMinutes -
+        dayOffset * 1440;
+
+
+      if (mins < 0) {
+
+        mins += 1440;
+
+        return {
+          day: dayOffset - 1,
+          mins
+        };
+      }
+
+
+      return {
+        day: dayOffset,
+        mins
+      };
+    }
+
+
+    /* =====================================================
+       MAIN TIME CONVERSION
+       ===================================================== */
+
+    async function convertToCST() {
+
+      const startDate =
+        document.getElementById('startDate').value;
+
+      const endDate =
+        document.getElementById('endDate').value;
+
+      const startTime =
+        document.getElementById('startTime').value;
+
+      const endTime =
+        document.getElementById('endTime').value;
+
+      const addBuffer =
+        document.getElementById('buffer').checked;
+
+      const tzBox =
+        document.getElementById('tzDisplay');
+
+
+      if (
+        !startDate ||
+        !endDate ||
+        !startTime ||
+        !endTime
+      ) {
+
+        showResult(
+          `<p>Please enter both dates and times.</p>`
+        );
+
+        return;
+      }
+
+
+      const daysGap =
+        daysBetweenISO(
+          startDate,
+          endDate
+        );
+
+
+      const startM =
+        parseTimeToMinutes(startTime);
+
+      const endM =
+        parseTimeToMinutes(endTime);
+
+
+      const endTotalFromStart =
+        daysGap * 1440 + endM;
+
+
+      if (endTotalFromStart < startM) {
+
+        showResult(
+          `<p>End date and time must be after start date and time.</p>`
+        );
+
+        return;
+      }
+
+
+      let sourceTz =
+        tzBox.value;
+
+
+      if (
+        !sourceTz ||
+        sourceTz === "-"
+      ) {
+
+        sourceTz =
+          await detectTimezoneFromInput();
+      }
+
+
+      if (
+        !sourceTz ||
+        !(sourceTz in offsets)
+      ) {
+
+        showResult(
+          `<p>Please enter a valid US ZIP or Canadian postal code first.</p>`
+        );
+
+        return;
+      }
+
+
+      const offsetDiffMinutes =
+        (
+          offsets["CST"] -
+          offsets[sourceTz]
+        ) * 60;
+
+
+      const startTotal =
+        startM + offsetDiffMinutes;
+
+      const endTotal =
+        endTotalFromStart +
+        offsetDiffMinutes;
+
+
+      const startSplit =
+        splitDay(startTotal);
+
+      const endSplit =
+        splitDay(endTotal);
+
+
+      const startDateObj =
+        parseISODate(startDate);
+
+
+      const startDateCST =
+        addDays(
+          startDateObj,
+          startSplit.day
+        );
+
+
+      const endDateCST =
+        addDays(
+          startDateObj,
+          endSplit.day
+        );
+
+
+      let monitorStartSplit =
+        startSplit;
+
+      let monitorEndSplit =
+        endSplit;
+
+      let monitorStartDateCST =
+        startDateCST;
+
+      let monitorEndDateCST =
+        endDateCST;
+
+
+      if (addBuffer) {
+
+        const bStart =
+          splitDay(
+            startTotal - 60
+          );
+
+        const bEnd =
+          splitDay(
+            endTotal + 60
+          );
+
+
+        monitorStartSplit =
+          bStart;
+
+        monitorEndSplit =
+          bEnd;
+
+
+        monitorStartDateCST =
+          addDays(
+            startDateObj,
+            bStart.day
+          );
+
+
+        monitorEndDateCST =
+          addDays(
+            startDateObj,
+            bEnd.day
+          );
+      }
+
+
+      const liveWindow =
+        `${formatISODateUTC(startDateCST)} ${formatClock(startSplit.mins)} – ${formatISODateUTC(endDateCST)} ${formatClock(endSplit.mins)} CST`;
+
+
+      const monitoringWindow =
+        addBuffer
+          ? `${formatISODateUTC(monitorStartDateCST)} ${formatClock(monitorStartSplit.mins)} – ${formatISODateUTC(monitorEndDateCST)} ${formatClock(monitorEndSplit.mins)} CST`
+          : liveWindow;
+
+
+      showResult(`
+
+        <strong>Campaign Live Window</strong>
+
+        <div>
+          ${liveWindow}
+        </div>
+
+        <br>
+
+        <strong style="color: var(--orange);">
+          Monitoring Window
+          ${addBuffer ? "(with buffer)" : ""}
+        </strong>
+
+        <div>
+          ${monitoringWindow}
+        </div>
+
+      `);
+
+
+      document.getElementById(
+        'resetBtn'
+      ).style.display = "block";
+    }
+
+
+    function showResult(html) {
+
+      const box =
+        document.getElementById('result');
+
+      box.style.display = "block";
+
+      box.innerHTML = html;
+    }
+
+
+    function resetForm() {
+
+      document.getElementById(
+        'zipCode'
+      ).value = "";
+
+
+      document.getElementById(
+        'tzDisplay'
+      ).value = "-";
+
+
+      const today =
+        new Date();
+
+
+      const y =
+        today.getFullYear();
+
+      const m =
+        String(
+          today.getMonth() + 1
+        ).padStart(2, '0');
+
+      const d =
+        String(
+          today.getDate()
+        ).padStart(2, '0');
+
+
+      const iso =
+        `${y}-${m}-${d}`;
+
+
+      document.getElementById(
+        'startDate'
+      ).value = iso;
+
+
+      document.getElementById(
+        'endDate'
+      ).value = iso;
+
+
+      document.getElementById(
+        'startTime'
+      ).value = "12:00";
+
+
+      document.getElementById(
+        'endTime'
+      ).value = "16:00";
+
+
+      document.getElementById(
+        'buffer'
+      ).checked = false;
+
+
+      const res =
+        document.getElementById('result');
+
+
+      res.innerHTML = "";
+
+      res.style.display = "none";
+
+
+      document.getElementById(
+        'zipError'
+      ).style.display = "none";
+
+
+      document.getElementById(
+        'resetBtn'
+      ).style.display = "none";
+    }
+
+
+    /* =====================================================
+       EVENT CAMPAIGN BUDGET
+       ===================================================== */
+
+    function handleBudgetSource() {
+
+      const source =
+        document.getElementById(
+          'budgetSource'
+        ).value;
+
+
+      const otherWrapper =
+        document.getElementById(
+          'otherCampaignWrapper'
+        );
+
+
+      const otherInput =
+        document.getElementById(
+          'otherCampaign'
+        );
+
+
+      if (source === "Other") {
+
+        otherWrapper.style.display =
+          "block";
+
+        otherInput.focus();
+
+      } else {
+
+        otherWrapper.style.display =
+          "none";
+
+        otherInput.value = "";
+      }
+    }
+
+
+    function formatCurrency(amount) {
+
+      return new Intl.NumberFormat(
+        'en-US',
+        {
+          style: 'currency',
+          currency: 'USD',
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        }
+      ).format(amount);
+    }
+
+
+    function formatLongDate(dateString) {
+
+      const date =
+        parseISODate(dateString);
+
+      const month =
+        String(
+          date.getUTCMonth() + 1
+        ).padStart(2, '0');
+
+      const day =
+        String(
+          date.getUTCDate()
+        ).padStart(2, '0');
+
+      const year =
+        String(
+          date.getUTCFullYear()
+        ).slice(-2);
+
+      return `${month}/${day}/${year}`;
+    }
+
+
+    function calculateBudget() {
+
+      const totalCampaignBudget =
+        parseFloat(
+          document.getElementById(
+            'totalCampaignBudget'
+          ).value
+        );
+
+
+      const totalEventBudget =
+        parseFloat(
+          document.getElementById(
+            'totalEventBudget'
+          ).value
+        );
+
+
+      const billingMonth =
+        document.getElementById(
+          'billingMonth'
+        ).value;
+
+
+      const budgetSource =
+        document.getElementById(
+          'budgetSource'
+        ).value;
+
+
+      const otherCampaign =
+        document.getElementById(
+          'otherCampaign'
+        ).value.trim();
+
+
+      const eventEndDate =
+        document.getElementById(
+          'eventEndDate'
+        ).value;
+
+
+      const result =
+        document.getElementById(
+          'budgetResult'
+        );
+
+
+      if (
+        isNaN(totalCampaignBudget) ||
+        totalCampaignBudget < 0
+      ) {
+
+        showBudgetError(
+          "Please enter a valid Total Campaign Budget."
+        );
+
+        return;
+      }
+
+
+      if (
+        isNaN(totalEventBudget) ||
+        totalEventBudget < 0
+      ) {
+
+        showBudgetError(
+          "Please enter a valid Total Event Budget."
+        );
+
+        return;
+      }
+
+
+      if (!billingMonth) {
+
+        showBudgetError(
+          "Please select the Current Billing Month."
+        );
+
+        return;
+      }
+
+
+      if (!budgetSource) {
+
+        showBudgetError(
+          "Please select the campaign where the budget was taken from."
+        );
+
+        return;
+      }
+
+
+      if (
+        budgetSource === "Other" &&
+        !otherCampaign
+      ) {
+
+        showBudgetError(
+          "Please enter the campaign name."
+        );
+
+        return;
+      }
+
+
+      if (!eventEndDate) {
+
+        showBudgetError(
+          "Please enter the Event Campaign End Date."
+        );
+
+        return;
+      }
+
+
+      if (
+        totalEventBudget >
+        totalCampaignBudget
+      ) {
+
+        showBudgetError(
+          "The Total Event Budget cannot be greater than the Total Campaign Budget."
+        );
+
+        return;
+      }
+
+
+      const campaignName =
+        budgetSource === "Other"
+          ? otherCampaign
+          : budgetSource;
+
+
+      const currentBillingBudget =
+        totalCampaignBudget -
+        totalEventBudget;
+
+
+      const formattedEndDate =
+        formatLongDate(eventEndDate);
+
+
+      result.innerHTML = `
+
+        <div class="budget-message">
+
+          ${formatCurrency(totalEventBudget)}
+          was taken from the
+          ${escapeHtml(campaignName)}
+          campaign from
+          ${billingMonth}
+          budget for an event running until
+          ${formattedEndDate}.
+
+        </div>
+
+        <strong>
+          Remaining Budget for ${billingMonth}
+        </strong>
+
+        <div class="budget-total">
+          ${formatCurrency(currentBillingBudget)}
+        </div>
+
+      `;
+
+
+      result.style.display = "block";
+
+
+      document.getElementById(
+        'budgetResetBtn'
+      ).style.display = "block";
+    }
+
+
+    function showBudgetError(message) {
+
+      const result =
+        document.getElementById(
+          'budgetResult'
+        );
+
+
+      result.innerHTML =
+        `<div class="error" style="margin:0;">${message}</div>`;
+
+
+      result.style.display = "block";
+
+
+      document.getElementById(
+        'budgetResetBtn'
+      ).style.display = "block";
+    }
+
+
+    function resetBudgetForm() {
+
+      document.getElementById(
+        'totalCampaignBudget'
+      ).value = "";
+
+
+      document.getElementById(
+        'totalEventBudget'
+      ).value = "";
+
+
+      document.getElementById(
+        'billingMonth'
+      ).value = "";
+
+
+      document.getElementById(
+        'budgetSource'
+      ).value = "";
+
+
+      document.getElementById(
+        'otherCampaign'
+      ).value = "";
+
+
+      document.getElementById(
+        'eventEndDate'
+      ).value = "";
+
+
+      document.getElementById(
+        'otherCampaignWrapper'
+      ).style.display = "none";
+
+
+      const result =
+        document.getElementById(
+          'budgetResult'
+        );
+
+
+      result.innerHTML = "";
+
+      result.style.display = "none";
+
+
+      document.getElementById(
+        'budgetResetBtn'
+      ).style.display = "none";
+    }
+
+
+    function escapeHtml(text) {
+
+      const div =
+        document.createElement('div');
+
+      div.textContent = text;
+
+      return div.innerHTML;
+    }
+
+
+    /* =====================================================
+       INITIALIZE DATES
+       ===================================================== */
+
+    (function initDates() {
+
+      const today =
+        new Date();
+
+
+      const y =
+        today.getFullYear();
+
+      const m =
+        String(
+          today.getMonth() + 1
+        ).padStart(2, '0');
+
+      const d =
+        String(
+          today.getDate()
+        ).padStart(2, '0');
+
+
+      const iso =
+        `${y}-${m}-${d}`;
+
+
+      document.getElementById(
+        'startDate'
+      ).value = iso;
+
+
+      document.getElementById(
+        'endDate'
+      ).value = iso;
+
+    })();
+
+  </script>
+
+</body>
+</html>
+  </template>
+
+
+  <!-- =========================================================
+       PIXEL CHECKER TEMPLATE
+       ========================================================= -->
+
+  <template id="pixel-checkerTemplate">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Pixel Check</title>
+
+<!-- Google Fonts: Quicksand -->
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --cyan:#79c0c3; 
+    --orange:#ff7b3d; 
+    --ink:#333; 
+    --line:#e5e7eb; 
+    --err:#d62828;
+    --softPink:#ffe8e8;
+    --softBlue:#e9fbff;
+  }
+
+  *{box-sizing:border-box}
+
+  body{
+    margin:0; 
+    font-family:'Quicksand', sans-serif;
+    background:linear-gradient(135deg, var(--softBlue) 0%, var(--softPink) 100%);
+    color:var(--ink);
+  }
+
+  .wrap{
+    max-width:820px;
+    margin:24px auto;
+    padding:0 16px;
+  }
+
+  .card{
+    background:#fff;
+    border-radius:20px;
+    box-shadow:0 8px 20px rgba(0,0,0,.1);
+    padding:26px;
+  }
+
+  h1{
+    margin:0 0 16px;
+    font-size:34px;
+    text-align:center;
+    color:var(--orange);
+    letter-spacing:.5px;
+    font-weight:700;
+  }
+
+  .table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:10px;
+  }
+
+  .table th,.table td{
+    padding:12px;
+    border-bottom:1px solid var(--line);
+    text-align:left;
+    vertical-align:middle;
+    font-size:15px;
+  }
+
+  .table th{
+    font-size:14px;
+    color:#555;
+  }
+
+  .rowhead{
+    width:210px;
+    font-weight:700;
+    color:var(--orange);
+  }
+
+  input[type="number"], select{
+    width:100%;
+    padding:10px;
+    border:1.8px solid var(--line);
+    border-radius:12px;
+    font-size:15px;
+    outline:none;
+    background:#fff;
+    transition:.2s;
+    font-family:'Quicksand', sans-serif;
+  }
+
+  input:focus, select:focus{
+    border-color:var(--cyan);
+    box-shadow:0 0 0 3px rgba(121,192,195,0.25);
+  }
+
+  input:disabled{
+    background:#f5f5f5;
+    cursor:not-allowed;
+  }
+
+  .time-grid{
+    display:grid;
+    grid-template-columns:1fr 150px;
+    gap:10px;
+  }
+
+  .btn{
+    margin-top:18px;
+    width:100%;
+    padding:14px;
+    border:0;
+    border-radius:12px;
+    font-weight:700;
+    font-size:17px;
+    cursor:pointer;
+    transition:.25s;
+    font-family:'Quicksand', sans-serif;
+  }
+
+  .btn-primary{
+    background:var(--orange);
+    color:#fff;
+  }
+
+  .btn-primary:hover:not(:disabled){
+    background:#ff905c;
+    transform:translateY(-1px);
+    box-shadow:0 4px 10px rgba(0,0,0,.1);
+  }
+
+  .btn-primary:disabled{
+    opacity:.45;
+    cursor:not-allowed;
+  }
+
+  .btn-secondary{
+    background:#fff;
+    color:var(--cyan);
+    border:2px solid var(--cyan);
+  }
+
+  .btn-secondary:hover{
+    background:var(--cyan);
+    color:#fff;
+    transform:translateY(-1px);
+    box-shadow:0 4px 10px rgba(0,0,0,.1);
+  }
+
+  .out{
+    margin-top:20px;
+    border:2px dashed var(--line);
+    border-radius:14px;
+    padding:24px;
+    text-align:center;
+    background:#fff;
+  }
+
+  .big{
+    font-size:42px;
+    font-weight:700;
+    letter-spacing:.5px;
+  }
+
+  .yes{
+    color:var(--cyan);
+  }
+
+  .no{
+    color:var(--orange);
+  }
+
+  .maybe{
+    color:var(--orange);
+  }
+
+  .err{
+    color:var(--err);
+    font-size:14px;
+    margin-top:10px;
+  }
+
+  /* Troubleshooting section */
+
+  .troubleshooting{
+    margin-top:22px;
+    text-align:left;
+  }
+
+  .troubleshooting-note{
+    text-align:center;
+    font-weight:700;
+    font-size:16px;
+    margin-bottom:16px;
+    color:var(--ink);
+  }
+
+  .scenario-label{
+    display:block;
+    margin-bottom:16px;
+    padding:10px 12px;
+    border-radius:10px;
+    background:var(--softPink);
+    color:var(--orange);
+    font-weight:700;
+    font-size:15px;
+    text-align:center;
+  }
+
+  .role-title{
+    text-align:center;
+    font-weight:700;
+    font-size:15px;
+    margin-bottom:10px;
+  }
+
+  .role-buttons{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+  }
+
+  .role-btn{
+    padding:12px;
+    border:2px solid var(--cyan);
+    border-radius:12px;
+    background:#fff;
+    color:var(--cyan);
+    font-family:'Quicksand', sans-serif;
+    font-size:15px;
+    font-weight:700;
+    cursor:pointer;
+    transition:.25s;
+  }
+
+  .role-btn:hover{
+    background:var(--cyan);
+    color:#fff;
+    transform:translateY(-1px);
+    box-shadow:0 4px 10px rgba(0,0,0,.1);
+  }
+
+  .role-btn.active{
+    background:var(--cyan);
+    color:#fff;
+  }
+
+  .instructions{
+    margin-top:18px;
+    padding:20px;
+    background:#f9ffff;
+    border:1px solid var(--line);
+    border-radius:12px;
+    font-size:14px;
+    line-height:1.6;
+  }
+
+  .instructions h3{
+    margin:0 0 14px;
+    color:var(--orange);
+    font-size:18px;
+  }
+
+  .instructions h4{
+    margin:18px 0 8px;
+    color:var(--cyan);
+    font-size:15px;
+  }
+
+  .instructions p{
+    margin:8px 0;
+  }
+
+  .instructions ul,
+  .instructions ol{
+    margin:8px 0 12px;
+    padding-left:24px;
+  }
+
+  .instructions li{
+    margin-bottom:8px;
+  }
+
+  .instructions ul li::marker{
+    color:var(--cyan);
+  }
+
+  .instructions ol li::marker{
+    color:var(--orange);
+    font-weight:700;
+  }
+
+  .instructions a{
+    color:var(--orange);
+    font-weight:700;
+  }
+
+  .example-box{
+    margin:10px 0;
+    padding:10px 12px;
+    background:#fff;
+    border-left:3px solid var(--cyan);
+    border-radius:6px;
+  }
+
+  @media(max-width:600px){
+    .role-buttons{
+      grid-template-columns:1fr;
+    }
+
+    .time-grid{
+      grid-template-columns:1fr;
+    }
+  }
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+  <div class="card">
+
+    <h1>✨ Are These Pixels Firing? ✨</h1>
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th></th>
+          <th>Activity Time</th>
+          <th>Users</th>
+        </tr>
+      </thead>
+
+      <tbody>
+
+        <tr>
+          <td class="rowhead">Lead Segment</td>
+
+          <td>
+            <div class="time-grid">
+              <input
+                id="leadTimeVal"
+                type="number"
+                min="0"
+                step="1"
+                autocomplete="off"
+              >
+
+              <select id="leadTimeUnit" aria-label="Lead time unit">
+                <option value="minutes">minute/s</option>
+                <option value="hours">hour/s</option>
+                <option value="days">day/s</option>
+                <option value="weeks">week/s</option>
+                <option value="months">month/s</option>
+                <option value="notseen">Not Yet Seen</option>
+              </select>
+            </div>
+          </td>
+
+          <td>
+            <input
+              id="leadUsers"
+              type="number"
+              min="0"
+              step="1"
+              inputmode="numeric"
+              autocomplete="off"
+            >
+          </td>
+        </tr>
+
+        <tr>
+          <td class="rowhead">Universal Segment</td>
+
+          <td>
+            <div class="time-grid">
+              <input
+                id="uniTimeVal"
+                type="number"
+                min="0"
+                step="1"
+                autocomplete="off"
+              >
+
+              <select id="uniTimeUnit" aria-label="Universal time unit">
+                <option value="minutes">minute/s</option>
+                <option value="hours">hour/s</option>
+                <option value="days">day/s</option>
+                <option value="weeks">week/s</option>
+                <option value="months">month/s</option>
+                <option value="notseen">Not Yet Seen</option>
+              </select>
+            </div>
+          </td>
+
+          <td>
+            <input
+              id="uniUsers"
+              type="number"
+              min="0"
+              step="1"
+              inputmode="numeric"
+              autocomplete="off"
+            >
+          </td>
+        </tr>
+
+      </tbody>
+    </table>
+
+    <div id="msg" class="err" style="display:none"></div>
+
+    <button
+      id="checkBtn"
+      class="btn btn-primary"
+      onclick="check()"
+      disabled
+    >
+      Check
+    </button>
+
+    <div
+      id="out"
+      class="out"
+      style="display:none"
+      aria-live="polite"
+    ></div>
+
+    <button
+      id="resetBtn"
+      class="btn btn-secondary"
+      style="display:none;"
+      onclick="resetForm()"
+    >
+      Reset
+    </button>
+
+  </div>
+</div>
+
+
+<script>
+
+function toMinutes(value, unit){
+
+  if(unit === 'notseen'){
+    return Infinity;
+  }
+
+  const n = +value;
+
+  if(!isFinite(n)){
+    return NaN;
+  }
+
+  switch(unit){
+    case 'minutes':
+      return n;
+
+    case 'hours':
+      return n * 60;
+
+    case 'days':
+      return n * 1440;
+
+    case 'weeks':
+      return n * 10080;
+
+    case 'months':
+      return n * 43200;
+
+    default:
+      return NaN;
+  }
+}
+
+
+function toggleTimeInput(selectId, inputId){
+
+  const select = document.getElementById(selectId);
+  const input = document.getElementById(inputId);
+
+  if(select.value === 'notseen'){
+
+    input.value = '';
+    input.disabled = true;
+
+  }else{
+
+    input.disabled = false;
+
+  }
+}
+
+
+function validate(){
+
+  const leadUnit =
+    document.getElementById('leadTimeUnit').value;
+
+  const uniUnit =
+    document.getElementById('uniTimeUnit').value;
+
+  const leadTimeVal =
+    document.getElementById('leadTimeVal').value;
+
+  const leadUsers =
+    document.getElementById('leadUsers').value;
+
+  const uniTimeVal =
+    document.getElementById('uniTimeVal').value;
+
+  const uniUsers =
+    document.getElementById('uniUsers').value;
+
+  const leadOK =
+    (leadUnit === 'notseen') ||
+    (leadTimeVal !== '');
+
+  const uniOK =
+    (uniUnit === 'notseen') ||
+    (uniTimeVal !== '');
+
+  const allFilled =
+    leadOK &&
+    uniOK &&
+    leadUsers !== '' &&
+    uniUsers !== '';
+
+  document.getElementById('checkBtn').disabled =
+    !allFilled;
+
+  document.getElementById('msg').style.display =
+    allFilled ? 'none' : 'block';
+
+  document.getElementById('msg').textContent =
+    allFilled
+      ? ''
+      : '⚠️ Please enter both times (or select Not Yet Seen) and both user counts.';
+}
+
+
+/*
+  Determine which troubleshooting scenario applies.
+
+  Scenario priority:
+
+  1. Lead Segment Has Not Been Detected
+  2. Universal Segment Has Not Been Detected
+  3. Both Lead and Universal have not recorded activity for an extended period of time
+  4. Lead Pixel has not recorded activity for an extended period of time
+  5. Universal Pixel has not recorded activity an extended period of time
+  6. Lead and Universal fired at the same time
+     AND user counts differ by 1 to 5
+  7. Lead and Universal fired at the same time
+  8. Universal users are lower than Lead users
+  9. Lead activity is more recent than Universal activity
+*/
+
+function determineScenario(
+  leadTime,
+  uniTime,
+  leadUsers,
+  uniUsers,
+  leadUnit,
+  uniUnit
+){
+
+  /*
+    Scenario 1:
+    Lead activity = 0 minutes OR Not Yet Seen
+  */
+
+  const leadNotDetected =
+    leadUnit === 'notseen' ||
+    leadTime === 0;
+
+  if(leadNotDetected){
+    return 'lead-not-detected';
+  }
+
+
+  /*
+    Scenario 2:
+    Universal activity = 0 minutes OR Not Yet Seen
+  */
+
+  const universalNotDetected =
+    uniUnit === 'notseen' ||
+    uniTime === 0;
+
+  if(universalNotDetected){
+    return 'universal-not-detected';
+  }
+
+
+  /*
+    Scenario 3:
+    Both Lead and Universal have not recorded activity
+    for an extended period of time.
+
+    7 days = 10,080 minutes.
+  */
+
+const moreThanSevenDays =
+  10080;
+
+  if(
+    isFinite(leadTime) &&
+    isFinite(uniTime) &&
+    leadTime > moreThanSevenDays &&
+    uniTime > moreThanSevenDays
+  ){
+    return 'both-long-inactive';
+  }
+
+
+  /*
+    Scenario 4:
+    Lead Pixel has not recorded activity
+    for an extended period of time.
+  */
+
+  if(
+    isFinite(leadTime) &&
+    leadTime > moreThanSevenDays
+  ){
+    return 'lead-long-inactive';
+  }
+
+
+  /*
+    Scenario 5:
+    Universal Pixel has not recorded activity
+    for an extended period of time.
+  */
+
+  if(
+    isFinite(uniTime) &&
+    uniTime >  moreThanSevenDays
+  ){
+    return 'universal-long-inactive';
+  }
+
+
+  /*
+    Scenario 6:
+    Activity times are exactly the same
+    AND user counts differ by 1 to 5.
+  */
+
+  const userDifference =
+    Math.abs(leadUsers - uniUsers);
+
+  if(
+    isFinite(leadTime) &&
+    isFinite(uniTime) &&
+    leadTime === uniTime &&
+    userDifference >= 1 &&
+    userDifference <= 5
+  ){
+    return 'same-time-similar-users';
+  }
+
+
+  /*
+    Scenario 7:
+    Activity times are exactly the same.
+  */
+
+  if(
+    isFinite(leadTime) &&
+    isFinite(uniTime) &&
+    leadTime === uniTime
+  ){
+    return 'same-time';
+  }
+
+
+  /*
+    Scenario 8:
+    Universal users are lower than Lead users.
+  */
+
+  if(
+    isFinite(leadUsers) &&
+    isFinite(uniUsers) &&
+    uniUsers < leadUsers
+  ){
+    return 'universal-lower';
+  }
+
+
+  /*
+    Scenario 9:
+    Lead activity is more recent than Universal activity.
+
+    Lower activity time = more recent.
+  */
+
+  if(
+    isFinite(leadTime) &&
+    isFinite(uniTime) &&
+    leadTime < uniTime
+  ){
+    return 'lead-more-recent';
+  }
+
+
+  return 'shared';
+}
+
+
+/*
+  Scenario titles are separate from the shared troubleshooting
+  instructions so each scenario can display the correct title.
+*/
+
+const scenarioTitles = {
+
+  'lead-long-inactive':
+    'Lead Pixel has not recorded activity for an extended period of time',
+
+  'universal-long-inactive':
+    'Universal Pixel has not recorded activity for an extended period of time',
+
+  'both-long-inactive':
+    'Both Lead and Universal segments have not recorded activity for an extended period of time',
+
+  'same-time-similar-users':
+    'Lead and Universal fired at the same time and their user counts are similar',
+
+  'same-time':
+    'Lead and Universal fired at exactly the same time',
+
+  'universal-lower':
+    'Universal segment users are lower than the Lead segment users',
+
+  'lead-more-recent':
+    'Lead segment activity is more recent than the Universal segment'
+};
+
+
+/*
+  Troubleshooting instructions.
+*/
+
+const troubleshooting = {
+
+  'lead-not-detected': {
+
+    title: 'Lead Segment Has Not Been Detected',
+
+    campaign: `
+
+      <ul>
+        <li>Confirm the <strong>Audience settings</strong> are correct.</li>
+
+        <li>
+          Double check the provided pixel with the
+          <strong>Onboarding/CS Rep</strong>.
+        </li>
+
+        <li>
+          Changes made today will load the next day.
+          Simpli.fi updates its audiences at
+          <strong>10:00 AM CST</strong>, so recheck the pixels after this time.
+        </li>
+      </ul>
+
+      <p><strong>If the Lead Pixel is still not firing:</strong></p>
+
+      <ol>
+
+        <li>
+          <strong>Confirm pixel placement</strong> with the Onboarding/CS Rep.
+
+          The Lead Pixel should be placed on conversion events such as:
+
+          <ul>
+            <li>Phone number click</li>
+            <li>Form submission</li>
+            <li>Message inquiry</li>
+            <li>Other defined conversion events</li>
+          </ul>
+
+          We recommend placing the Lead Pixel on at least
+          <strong>2 to 3 conversion events</strong>.
+        </li>
+
+        <li>
+          <strong>Check how the client installed the pixel.</strong>
+
+          Backend installation can make it difficult for the pixel to fire
+          correctly. Recommend reinstalling it through
+          <strong>Google Tag Manager (GTM)</strong>, or offer assistance by
+          having the client provide us access. Please reach out to the Campaign team for the correct email address to use for the GTM access invitation. Make sure the <strong>GTM container</strong> is already installed on the website.
+        </li>
+
+        <li>
+          <strong>Check if the client URL is a subpage of a parent URL.</strong>
+
+          A separate pixel may be needed to accurately track actions and
+          conversions on that specific subpage.
+
+          <div class="example-box">
+            <strong>Parent URL:</strong> hotelwebsite.com<br>
+            <strong>Subpage:</strong> hotelwebsite.com/locations/new-york
+          </div>
+
+          If the website uses a different URL or page structure for each
+          location, a separate pixel may be required to track activity on
+          the specific location page.
+
+          Review the <strong>Pixel and GTM Training Manual</strong>  
+          for
+          setup instructions and provide the appropriate pixel to the
+          Onboarding/CS Rep. Review  
+            <strong>ReTV Pixel Installation CS Workflow</strong> if needed.
+        </li>
+
+      </ol>
+    `,
+
+    onboarding: `
+
+      <ul>
+
+        <li>
+          Confirm the installed pixel matches the pixel provided by the
+          <strong>Campaign Rep</strong>.
+        </li>
+
+        <li>
+          Changes made today will load the next day.
+          Simpli.fi updates its audiences at
+          <strong>10:00 AM CST</strong>, so recheck the pixels after this time.
+        </li>
+
+      </ul>
+
+      <p><strong>If the Lead Pixel is still not firing:</strong></p>
+
+      <ol>
+
+        <li>
+          <strong>Confirm pixel placement</strong> with the client.
+
+          The Lead Pixel should fire on conversion events such as:
+
+          <ul>
+            <li>Phone number clicks</li>
+            <li>Form submissions</li>
+            <li>Message inquiries</li>
+            <li>Other defined conversion events</li>
+          </ul>
+
+          We recommend placing it on at least
+          <strong>2 to 3 conversion events</strong>.
+        </li>
+
+        <li>
+          <strong>Check how the client installed the pixel.</strong>
+
+          Backend installation can make it difficult for the pixel to fire
+          correctly. Recommend reinstalling through
+          <strong>GTM</strong>, or offer assistance by having the client
+          provide us access. Please reach out to the Campaign team for the correct email address to use for the GTM access invitation. Make sure that the <strong>GTM container</strong> is already installed on the website.
+        </li>
+
+        <li>
+          <p>
+            If the client’s URL is a subpage of a main or parent URL, a
+            separate pixel may be needed to accurately capture actions and
+            conversions occurring specifically on that subpage.
+          </p>
+
+          <p>
+            This is especially common with our hotel clients. For example,
+            the <strong>parent URL</strong> may be the hotel’s main website,
+            while the <strong>subpages</strong> may be specific location or
+            property pages:
+          </p>
+
+          <div class="example-box">
+            <strong>Parent URL:</strong> hotelwebsite.com<br>
+            <strong>Subpage:</strong> hotelwebsite.com/locations/new-york
+          </div>
+
+          <p>
+            In this case, the client’s website may use a different page or
+            URL structure for each location, so a separate pixel may be
+            needed to accurately track actions taken on the specific
+            location page. If this is the case, please reach out to the
+            Campaign Rep to request the appropriate pixel code for the
+            client’s URL.
+          </p>
+
+<p>
+  <strong>Need additional help?</strong>
+  Please review
+  our <a href="https://netorg381145.sharepoint.com/sites/IntrinsicDigital/Shared%20Documents/Forms/AllItems.aspx?id=%2Fsites%2FIntrinsicDigital%2FShared%20Documents%2FIDM%2FINTRINSIC%20DIGITAL%2FOnboarding%2FGTM%20Pixel%20Installation%20Instructions%2F2026&p=true&ga=1" target="_blank">
+    GTM & Pixel Installation Guide
+</a>
+or use the
+  <a href="https://chatgpt.com/g/g-69b3fb918938819182be4c870d350252-gtm-pixel-retv-guide" target="_blank">
+    GTM & Pixel ReTV Guide GPT
+  </a>
+</p>
+        </li>
+
+      </ol>
+    `
+  },
+
+
+  'universal-not-detected': {
+
+    title: 'Universal Segment Has Not Been Detected',
+
+    campaign: `
+
+      <ul>
+
+        <li>
+          Confirm the <strong>Audience settings</strong> are correct.
+        </li>
+
+        <li>
+          Confirm the website URL in the settings is spelled correctly.
+        </li>
+
+        <li>
+          Double check the provided pixel with the
+          <strong>Onboarding/CS Rep</strong>.
+        </li>
+
+        <li>
+          Changes made today will load the next day.
+          Simpli.fi updates its audiences at
+          <strong>10:00 AM CST</strong>, so recheck the pixels after this time.
+        </li>
+
+      </ul>
+
+      <p><strong>If the Universal Pixel is still not firing:</strong></p>
+
+      <ol>
+
+        <li>
+          <strong>Confirm pixel placement</strong> with the Onboarding/CS Rep.
+
+          The Universal Pixel should load on
+          <strong>every page</strong> of the client's website.
+
+          It can typically be placed in the website's global header or
+          sitewide tracking section.
+
+          If the client uses <strong>GTM</strong>, configure the Universal
+          Pixel to fire on all pages.
+        </li>
+
+        <li>
+          If the client’s URL is a subpage of a main or parent URL, a
+          separate pixel may be needed to accurately capture actions and
+          conversions occurring specifically on that subpage.
+
+          <p>
+            This is especially common with our hotel clients. For example,
+            the <strong>parent URL</strong> may be the hotel’s main website,
+            while the <strong>subpages</strong> may be specific location or
+            property pages:
+          </p>
+
+          <div class="example-box">
+            <strong>Parent URL:</strong> hotelwebsite.com<br>
+            <strong>Subpage:</strong> hotelwebsite.com/locations/new-york
+          </div>
+
+          <p>
+            In this case, the client’s website may use a different page or
+            URL structure for each location, so a separate pixel may be
+            needed to accurately track actions taken on the specific
+            location page. If this is the case, please review 
+            our <strong>Pixel and GTM Training Manual</strong> for 
+            instructions and provide the new pixel to Onboarding/CS Rep. Review  
+            <strong>ReTV Pixel Installation CS Workflow</strong> if needed.
+          </p>
+        </li>
+
+      </ol>
+    `,
+
+    onboarding: `
+
+      <ul>
+
+        <li>
+          Changes made today will load the next day.
+          Simpli.fi updates its audiences at
+          <strong>10:00 AM CST</strong>, so recheck the pixels after this time.
+        </li>
+
+        <li>
+          Confirm pixel placement with the client.
+
+          The Universal Pixel should load on
+          <strong>every page</strong> and can typically be placed in the
+          website's global header, sitewide tracking section, or through
+          GTM configured to fire on all pages.
+        </li>
+
+        <li>
+          Confirm whether the client's URL is a subpage of a larger
+          parent website.
+
+          If so, <strong>two pixels may be required</strong>:
+
+          <ul>
+            <li>One for the parent URL</li>
+            <li>One for the specific location subpage</li>
+          </ul>
+        </li>
+
+      </ul>
+
+      <div class="example-box">
+        <strong>Parent URL:</strong> hotelwebsite.com<br>
+        <strong>Location Subpage:</strong> hotelwebsite.com/locations/new-york
+      </div>
+
+      <p>
+        The pixel code for the parent URL should be different from the
+        pixel code for the location subpage. Both pixels should be installed
+        where they will load properly on their respective pages.
+      </p>
+
+      <p>
+        If applicable, reach out to the
+        <strong>Campaign Rep</strong> for the appropriate pixel code and
+        have the Audience settings updated accordingly.
+      </p>
+<p>
+  <strong>Need additional help?</strong>
+  Please review
+  our <a href="https://netorg381145.sharepoint.com/sites/IntrinsicDigital/Shared%20Documents/Forms/AllItems.aspx?id=%2Fsites%2FIntrinsicDigital%2FShared%20Documents%2FIDM%2FINTRINSIC%20DIGITAL%2FOnboarding%2FGTM%20Pixel%20Installation%20Instructions%2F2026&p=true&ga=1" target="_blank">
+    GTM & Pixel Installation Guide
+  </a>
+or use the
+  <a href="https://chatgpt.com/g/g-69b3fb918938819182be4c870d350252-gtm-pixel-retv-guide" target="_blank">
+    GTM & Pixel ReTV Guide GPT
+  </a>
+</p>
+    `
+  },
+
+
+  /*
+    NEW SCENARIO:
+    Lead Pixel has not recorded activity for an extended period of time.
+  */
+
+  'lead-long-inactive': {
+
+    title: 'Lead Pixel has not recorded activity for an extended period of time',
+
+    campaign: `
+
+      <p>
+        This may be caused by low website activity rather than an issue
+        with the pixel. However, we recommend completing the checks below
+        to make sure we are not overlooking a potential issue and are
+        maximizing the opportunity to capture Lead activity.
+      </p>
+
+      <ol>
+
+        <li>
+          Check the client’s location. If rural or suburban, very low
+          website traffic can result in little or no recent Lead Pixel
+          activity.
+        </li>
+
+        <li>
+          Confirm the client website works properly and is accessible.
+        </li>
+
+        <li>
+          Check pixel settings in Simpli.fi and confirm all settings are
+          correct.
+        </li>
+
+        <li>
+          Confirm Lead Pixel placement with Onboarding/CS Rep.
+
+          Recommend placing Lead Pixel on at least
+          <strong>2 to 3 conversion events</strong>.
+        </li>
+
+        <li>
+          If the Lead Pixel is still not firing correctly:
+
+          <ul>
+            <li>
+              Reach out to Onboarding/CS Rep and say Lead Pixel installation
+              may need to be revisited.
+            </li>
+
+            <li>
+              Provide guidance on correct Lead Pixel placement. It should
+              be on specific conversion events such as:
+
+              <ul>
+                <li>Phone number clicks</li>
+                <li>Form submissions</li>
+                <li>Message inquiries</li>
+                <li>Other defined conversion events</li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+
+      </ol>
+    `,
+
+    onboarding: `
+
+      <ol>
+
+        <li>
+          Reach out to Campaign Team to confirm Simpli.fi settings are
+          correct.
+        </li>
+
+        <li>
+          Confirm client website works properly and is accessible.
+
+          If there is an issue, tell the client it needs to be resolved
+          because it may affect pixel activity.
+        </li>
+
+        <li>
+          Confirm Lead Pixel placement with client.
+
+          If only installed on one conversion action, recommend placing
+          it on at least <strong>2 to 3 conversion events</strong>.
+
+          The Lead Pixel should be placed on:
+
+          <ul>
+            <li>Phone number clicks</li>
+            <li>Form submissions</li>
+            <li>Message inquiries</li>
+            <li>Other defined conversion events</li>
+          </ul>
+        </li>
+
+        <li>
+          Check whether client URL is a subpage of a main or parent
+          website.
+
+          If so, a separate pixel may be needed to accurately capture
+          actions and conversions on that subpage.
+
+          This is especially common with hotel clients.
+
+          <div class="example-box">
+            <strong>Parent URL:</strong> hotelwebsite.com<br>
+            <strong>Subpage:</strong> hotelwebsite.com/locations/new-york
+          </div>
+
+          If website uses different URL or page structure for each
+          location, separate pixel may be needed for the specific
+          location page.
+
+          If applicable, reach out to Campaign Rep to request the
+          appropriate pixel code for the client URL.
+
+<p>
+  <strong>Need additional help?</strong>
+  Please review
+  our <a href="https://netorg381145.sharepoint.com/sites/IntrinsicDigital/Shared%20Documents/Forms/AllItems.aspx?id=%2Fsites%2FIntrinsicDigital%2FShared%20Documents%2FIDM%2FINTRINSIC%20DIGITAL%2FOnboarding%2FGTM%20Pixel%20Installation%20Instructions%2F2026&p=true&ga=1" target="_blank">
+    GTM & Pixel Installation Guide
+  </a>
+or use the
+  <a href="https://chatgpt.com/g/g-69b3fb918938819182be4c870d350252-gtm-pixel-retv-guide" target="_blank">
+    GTM & Pixel ReTV Guide GPT
+  </a>
+</p>
+        </li>
+
+      </ol>
+    `
+  },
+
+
+  /*
+    NEW SCENARIO:
+    Universal Pixel has not recorded activity for extended period of time.
+  */
+
+  'universal-long-inactive': {
+
+    title: 'Universal Pixel has not recorded activity for an extended period of time',
+
+    campaign: `
+
+      <p>
+        This is <strong>very unlikely</strong> to happen. If it does, it would most likely
+        indicate that the Universal Pixel was not installed correctly.
+      </p>
+
+      <ol>
+
+        <li>
+          Confirm Audience settings in Simpli.fi are correct.
+        </li>
+
+        <li>
+          Confirm website URL in settings is spelled correctly.
+        </li>
+
+        <li>
+          Double check provided pixel with Onboarding/CS Rep.
+        </li>
+
+        <li>
+          If Universal Pixel is still not firing:
+
+          <ul>
+
+            <li>
+              Confirm Universal Pixel placement with Onboarding/CS Rep.
+
+              Universal Pixel should load on every page. It can be in
+              global header or sitewide tracking. If GTM, configure it to
+              fire on all pages.
+            </li>
+
+            <li>
+              Confirm whether client URL is a subpage of larger parent
+              website.
+
+              If so, Universal Segment website settings may need updating
+              to the specific client URL. Different Universal Pixel code
+              may also need to be provided to Onboarding/CS Rep so it can
+              track the specific subpage.
+            </li>
+
+            <li>
+              Review <strong>Pixel and GTM Manual</strong> for correct
+              setup and pixel installation instructions.
+            </li>
+
+          </ul>
+        </li>
+
+      </ol>
+    `,
+
+    onboarding: `
+
+      <p>
+        This is <strong>very unlikely</strong> to happen. If it does, it would most likely
+        indicate that the Universal Pixel was not installed correctly.
+      </p>
+
+      <ol>
+
+        <li>
+          Confirm Universal Pixel placement with client.
+
+          It should load every page. It can be in global header or
+          sitewide tracking. If GTM, configure it to fire on all pages.
+        </li>
+
+        <li>
+          Confirm whether client URL is a subpage of larger parent
+          website.
+
+          If so, two pixels may need to be installed: one for the parent
+          URL and one for the specific location subpage.
+
+          <div class="example-box">
+            <strong>Parent URL:</strong> hotelwebsite.com<br>
+            <strong>Location Subpage:</strong> hotelwebsite.com/locations/new-york
+          </div>
+
+          Parent pixel code should differ from location subpage pixel
+          code. Both should be installed where they load properly on
+          their respective pages.
+        </li>
+
+        <li>
+          If this applies, reach out to Campaign Rep to request
+          appropriate pixel code and have Audience settings updated
+          accordingly.
+        </li>
+<p>
+  <strong>Need additional help?</strong>
+  Please review
+  our <a href="https://netorg381145.sharepoint.com/sites/IntrinsicDigital/Shared%20Documents/Forms/AllItems.aspx?id=%2Fsites%2FIntrinsicDigital%2FShared%20Documents%2FIDM%2FINTRINSIC%20DIGITAL%2FOnboarding%2FGTM%20Pixel%20Installation%20Instructions%2F2026&p=true&ga=1" target="_blank">
+    GTM & Pixel Installation Guide
+</a>
+or use the
+  <a href="https://chatgpt.com/g/g-69b3fb918938819182be4c870d350252-gtm-pixel-retv-guide" target="_blank">
+    GTM & Pixel ReTV Guide GPT
+  </a>
+</p>
+      </ol>
+    `
+  },
+
+
+  /*
+    NEW SCENARIO:
+    Both Lead and Universal segments have not recorded activity
+    for an extended period of time.
+  */
+
+  'both-long-inactive': {
+
+    title: 'Both Lead and Universal segments have not recorded activity for an extended period of time',
+
+    campaign: `
+
+      <p>
+        This may be caused by low website activity, particularly if the
+        client is in a rural or suburban area. However, because both
+        segments have had no recent activity, we recommend completing
+        the checks below to make sure we are not overlooking an
+        installation or configuration issue.
+      </p>
+
+      <ol>
+
+        <li>
+          Check client’s location. Rural or suburban may have low
+          website traffic and little or no recent pixel activity.
+        </li>
+
+        <li>
+          Confirm the <strong>client's website</strong> works properly and is accessible.
+        </li>
+
+        <li>
+          Check pixel settings in Simpli.fi and confirm all are correct.
+        </li>
+
+        <li>
+          Let Onboarding/CS Rep know pixel installation should be
+          revisited since both pixels have not recorded activity for
+          extended period.
+        </li>
+
+        <li>
+          Review <strong>GTM and Pixel Manual</strong> for guidance on
+          appropriate installation and troubleshooting steps.
+        </li>
+
+      </ol>
+    `,
+
+    onboarding: `
+
+      <ol>
+
+        <li>
+          Reach out to Campaign Team to confirm Simpli.fi settings are
+          correct.
+        </li>
+
+        <li>
+          Confirm client website works properly and is accessible.
+
+          If there is an issue, tell the client it needs to be resolved
+          because it may affect pixel activity.
+        </li>
+
+        <li>
+          If pixels are still not firing correctly:
+
+          <ul>
+
+            <li>
+              Let client know pixels may not be firing correctly and
+              installation needs to be revisited.
+            </li>
+
+            <li>
+              Confirm placement of both pixels.
+            </li>
+
+            <li>
+              Provide guidance on the correct placement for each pixel.
+            </li>
+</li>
+  <strong>Need additional help?</strong>
+  Please review
+  our <a href="https://netorg381145.sharepoint.com/sites/IntrinsicDigital/Shared%20Documents/Forms/AllItems.aspx?id=%2Fsites%2FIntrinsicDigital%2FShared%20Documents%2FIDM%2FINTRINSIC%20DIGITAL%2FOnboarding%2FGTM%20Pixel%20Installation%20Instructions%2F2026&p=true&ga=1" target="_blank">
+    GTM & Pixel Installation Guide
+</a>
+or use the
+  <a href="https://chatgpt.com/g/g-69b3fb918938819182be4c870d350252-gtm-pixel-retv-guide" target="_blank">
+    GTM & Pixel ReTV Guide GPT
+  </a>
+</li>
+
+          </ul>
+        </li>
+
+      </ol>
+    `
+  },
+
+
+  /*
+    Scenarios below all use the same troubleshooting instructions.
+  */
+
+  'shared': {
+
+    campaign: `
+
+      <p>
+        This can sometimes happen temporarily. Recheck after a few hours
+        or after <strong>10:00 AM CST</strong>, when Simpli.fi updates
+        its audiences.
+      </p>
+
+      <p>
+        If the pixels are still not firing correctly
+        after the audience update:
+      </p>
+
+      <ul>
+
+        <li>
+          Reach out to the <strong>Onboarding/CS Rep</strong> and let them
+          know the pixels may not be firing correctly.
+        </li>
+
+        <li>
+          Confirm the placement of both the
+          <strong>Lead Pixel</strong> and <strong>Universal Pixel</strong>.
+        </li>
+
+        <li>
+          Provide guidance on where each pixel should be placed.
+        </li>
+
+      </ul>
+
+      <p>
+        If the user counts have already been inflated,
+        <strong>delete the current Audiences, NOT the Tags/Pixel Code</strong>,
+        and create new Audiences to accurately track pixel activity
+        moving forward.
+      </p>
+
+      <p>
+        After creating the new Audiences, continue monitoring activity to
+        confirm the Lead and Universal pixels are firing correctly. Review <strong>GTM and Pixel Manual</strong> for more guidance on
+          appropriate installation and troubleshooting steps.
+      </p>
+    `,
+
+    onboarding: `
+
+      <p>
+        This can sometimes happen temporarily. Recheck after a few hours
+        or after <strong>10:00 AM CST</strong>, when Simpli.fi updates
+        its audiences.
+      </p>
+
+      <p>
+        If the pixels are still not firing correctly:
+      </p>
+
+      <ul>
+
+        <li>
+          Reach out to the client and let them know the pixels are not
+          firing correctly.
+        </li>
+
+        <li>
+          Confirm the placement of both pixels.
+        </li>
+
+        <li>
+          Provide guidance on the correct placement for each pixel.
+        </li>
+
+      </ul>
+
+      <h4 style="color:var(--orange);">Universal Pixel Placement</h4>
+
+      <ul>
+
+        <li>
+          The Universal Pixel should load on
+          <strong>every page</strong> of the client's website.
+        </li>
+
+        <li>
+          It can typically be placed in the website header or sitewide
+          tracking section.
+        </li>
+
+        <li>
+          If using GTM, configure it to fire on
+          <strong>all pages</strong>.
+        </li>
+
+      </ul>
+
+      <h4 style="color:var(--orange);">Lead Pixel Placement</h4>
+
+      <ul>
+
+        <li>
+          The Lead Pixel should <strong>not</strong> be placed in the
+          header, footer, or anywhere it will load on every page.
+        </li>
+
+        <li>
+          It should only fire when a specific conversion occurs, such as:
+
+          <ul>
+            <li>Phone number click</li>
+            <li>Booking confirmation</li>
+            <li>"Send Us a Message" click</li>
+            <li>Form submission</li>
+            <li>Other defined conversion actions</li>
+          </ul>
+        </li>
+
+      </ul>
+
+      <p>
+        Confirm that each pixel is installed according to its intended
+        purpose so Lead and Universal activity can be tracked accurately.
+      </p>
+<p>
+  <strong>Need additional help?</strong>
+  Please review
+  our <a href="https://netorg381145.sharepoint.com/sites/IntrinsicDigital/Shared%20Documents/Forms/AllItems.aspx?id=%2Fsites%2FIntrinsicDigital%2FShared%20Documents%2FIDM%2FINTRINSIC%20DIGITAL%2FOnboarding%2FGTM%20Pixel%20Installation%20Instructions%2F2026&p=true&ga=1" target="_blank">
+    GTM & Pixel Installation Guide
+</a>
+or use the
+  <a href="https://chatgpt.com/g/g-69b3fb918938819182be4c870d350252-gtm-pixel-retv-guide" target="_blank">
+    GTM & Pixel ReTV Guide GPT
+  </a>
+</p>
+    `
+  }
+
+};
+
+
+/*
+  Show troubleshooting section after a NO or MAYBE result.
+*/
+
+function showTroubleshooting(scenario, result = 'no'){
+
+  const out = document.getElementById('out');
+
+  let scenarioTitle;
+
+  if(
+    scenario === 'lead-not-detected' ||
+    scenario === 'universal-not-detected'
+  ){
+
+    scenarioTitle =
+      troubleshooting[scenario].title;
+
+  }else{
+
+    scenarioTitle =
+      scenarioTitles[scenario] ||
+      'Lead and Universal Segment user counts are too similar';
+
+  }
+
+
+  const resultDisplay =
+    result === 'maybe'
+      ? `
+        <div class="big maybe">
+          🤔 MAYBE 🤔
+        </div>
+      `
+      : `
+        <div class="big no">
+          🥺 NO 💔
+        </div>
+      `;
+
+
+  out.innerHTML = `
+
+    ${resultDisplay}
+
+    <div class="troubleshooting">
+
+      <div class="troubleshooting-note">
+        Please review troubleshooting instructions below.
+      </div>
+
+      <div class="scenario-label">
+        ${scenarioTitle}
+      </div>
+
+      <div class="role-title">
+        Select your role:
+      </div>
+
+      <div class="role-buttons">
+
+        <button
+          type="button"
+          class="role-btn"
+          onclick="selectRole('campaign', '${scenario}', this)"
+        >
+          Campaign Team
+        </button>
+
+        <button
+          type="button"
+          class="role-btn"
+          onclick="selectRole('onboarding', '${scenario}', this)"
+        >
+          Onboarding & Client Success
+        </button>
+
+      </div>
+
+      <div
+        id="instructions"
+        class="instructions"
+        style="display:none;"
+      ></div>
+
+    </div>
+  `;
+}
+
+
+/*
+  Display instructions for the selected role.
+*/
+
+function selectRole(role, scenario, button){
+
+  const instructions =
+    document.getElementById('instructions');
+
+  let instructionSet;
+
+  /*
+    These scenarios have their own separate
+    Campaign Team and Onboarding instructions.
+  */
+
+  if(
+    scenario === 'lead-not-detected' ||
+    scenario === 'universal-not-detected' ||
+    scenario === 'lead-long-inactive' ||
+    scenario === 'universal-long-inactive' ||
+    scenario === 'both-long-inactive'
+  ){
+
+    instructionSet =
+      troubleshooting[scenario];
+
+  }else{
+
+    instructionSet =
+      troubleshooting.shared;
+
+  }
+
+  if(role === 'campaign'){
+
+    instructions.innerHTML =
+      instructionSet.campaign;
+
+  }else{
+
+    instructions.innerHTML =
+      instructionSet.onboarding;
+
+  }
+
+  instructions.style.display =
+    'block';
+
+  document.querySelectorAll('.role-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+
+  button.classList.add('active');
+}
+
+
+/*
+  Main checker.
+*/
+
+function check(){
+
+  const leadUnit =
+    document.getElementById('leadTimeUnit').value;
+
+  const uniUnit =
+    document.getElementById('uniTimeUnit').value;
+
+  const leadTime =
+    toMinutes(
+      document.getElementById('leadTimeVal').value,
+      leadUnit
+    );
+
+  const uniTime =
+    toMinutes(
+      document.getElementById('uniTimeVal').value,
+      uniUnit
+    );
+
+  const leadUsers =
+    +document.getElementById('leadUsers').value;
+
+  const uniUsers =
+    +document.getElementById('uniUsers').value;
+
+  const scenario =
+    determineScenario(
+      leadTime,
+      uniTime,
+      leadUsers,
+      uniUsers,
+      leadUnit,
+      uniUnit
+    );
+
+  const out =
+    document.getElementById('out');
+
+  out.style.display = 'block';
+
+
+  /*
+    Same-time and long-inactive scenarios = MAYBE.
+  */
+
+  if(
+    scenario === 'same-time' ||
+    scenario === 'same-time-similar-users' ||
+    scenario === 'lead-long-inactive' ||
+    scenario === 'universal-long-inactive' ||
+    scenario === 'both-long-inactive'
+  ){
+
+    showTroubleshooting(
+      scenario,
+      'maybe'
+    );
+
+  }else{
+
+    const notDetected =
+      scenario === 'lead-not-detected' ||
+      scenario === 'universal-not-detected';
+
+    const activityOK =
+      isFinite(leadTime) &&
+      isFinite(uniTime)
+        ? (uniTime < leadTime)
+        : true;
+
+    const usersOK =
+      isFinite(uniUsers) &&
+      isFinite(leadUsers) &&
+      (uniUsers > leadUsers);
+
+    const ok =
+      !notDetected &&
+      activityOK &&
+      usersOK;
+
+    if(ok){
+
+      out.innerHTML = `
+        <div class="big yes">
+          🎉 YES 🎉
+        </div>
+      `;
+
+    }else{
+
+      showTroubleshooting(
+        scenario,
+        'no'
+      );
+
+    }
+  }
+
+  document.getElementById('resetBtn').style.display =
+    'block';
+}
+
+
+/*
+  Reset everything.
+*/
+
+function resetForm(){
+
+  document.getElementById('leadTimeVal').value = '';
+  document.getElementById('leadUsers').value = '';
+
+  document.getElementById('uniTimeVal').value = '';
+  document.getElementById('uniUsers').value = '';
+
+  document.getElementById('leadTimeUnit').value =
+    'minutes';
+
+  document.getElementById('uniTimeUnit').value =
+    'minutes';
+
+  document.getElementById('leadTimeVal').disabled =
+    false;
+
+  document.getElementById('uniTimeVal').disabled =
+    false;
+
+  document.getElementById('out').style.display =
+    'none';
+
+  document.getElementById('resetBtn').style.display =
+    'none';
+
+  document.getElementById('checkBtn').disabled =
+    true;
+
+  document.getElementById('msg').style.display =
+    'none';
+}
+
+
+/*
+  Attach listeners to all fields.
+*/
+
+(function init(){
+
+  const fields = [
+    'leadTimeVal',
+    'leadUsers',
+    'uniTimeVal',
+    'uniUsers'
+  ];
+
+  fields.forEach(id => {
+
+    document.getElementById(id).addEventListener(
+      'input',
+      validate
+    );
+
+    document.getElementById(id).addEventListener(
+      'change',
+      validate
+    );
+
+  });
+
+
+  [
+    'leadTimeUnit',
+    'uniTimeUnit'
+  ].forEach(id => {
+
+    document.getElementById(id).addEventListener(
+      'change',
+      () => {
+
+        if(id === 'leadTimeUnit'){
+
+          toggleTimeInput(
+            'leadTimeUnit',
+            'leadTimeVal'
+          );
+
+        }
+
+        if(id === 'uniTimeUnit'){
+
+          toggleTimeInput(
+            'uniTimeUnit',
+            'uniTimeVal'
+          );
+
+        }
+
+        validate();
+
+      }
+    );
+
+  });
+
+
+  // Set initial state
+
+  toggleTimeInput(
+    'leadTimeUnit',
+    'leadTimeVal'
+  );
+
+  toggleTimeInput(
+    'uniTimeUnit',
+    'uniTimeVal'
+  );
+
+  validate();
+
+})();
+
+</script>
+
+</body>
+</html>
+  </template>
+
+  <!-- =========================================================
+       GEOFENCE COUNTER TEMPLATE
+       ========================================================= -->
+
+  <template id="geofenceCounterTemplate">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Geofence Counter</title>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    :root {
+  --cyan: #123b63;
+  --orange: #e9660a;
+  --ink: #333;
+      --line: #e5e7eb;
+      --soft-pink: #ffe8e8;
+      --soft-blue: #e9fbff;
+
+      --white: #ffffff;
+      --text: #333;
+      --muted: #666;
+      --green: #4d9b72;
+      --green-light: #eff9f3;
+      --red: #d62828;
+      --red-light: #ffe8e8;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(
+        135deg,
+        var(--soft-blue) 0%,
+        var(--soft-pink) 100%
+      );
+      color: var(--ink);
+      font-family: "Quicksand", sans-serif;
+    }
+
+    button,
+    input,
+    textarea {
+      font-family: "Quicksand", sans-serif;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1500px;
+      margin: 24px auto;
+      padding: 0 16px 40px;
+    }
+
+    .page-header {
+      margin-bottom: 20px;
+    }
+
+    .page-header-left {
+      min-width: 0;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      text-align: center;
+      font-size: 34px;
+      line-height: 1.15;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    h1 .geofence {
+      color: var(--cyan);
+    }
+
+    h1 .counter {
+      color: var(--orange);
+    }
+
+    .subtitle {
+      max-width: none;
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+      font-weight: 500;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .card {
+      background: var(--white);
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      padding: 0;
+      overflow: hidden;
+      border: none;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .section-number {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      flex-shrink: 0;
+      border-radius: 9px;
+      background: var(--cyan);
+      color: white;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .section-heading-text h2 {
+      margin: 0;
+      color: var(--orange);
+      font-size: 17px;
+      font-weight: 700;
+    }
+
+    .section-heading-text p {
+      margin: 3px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .package-card {
+      margin-bottom: 20px;
+    }
+
+    .package-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      padding: 18px 24px 22px;
+    }
+
+    .package-option {
+      position: relative;
+      min-height: 76px;
+      padding: 15px 17px;
+      background: #fff;
+      border: 1.8px solid var(--line);
+      border-radius: 12px;
+      cursor: pointer;
+      transition:
+        border-color 0.2s ease,
+        background 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+    }
+
+    .package-option:hover {
+      border-color: var(--cyan);
+      background: #f9ffff;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+    }
+
+    .package-option.active {
+      background: var(--soft-blue);
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 3px rgba(121, 192, 195, 0.15);
+    }
+
+    .package-option-content {
+      padding-right: 28px;
+    }
+
+    .package-name {
+      margin-bottom: 4px;
+      color: var(--orange);
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .package-locations {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .package-check {
+      position: absolute;
+      top: 13px;
+      right: 13px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      width: 21px;
+      height: 21px;
+      border-radius: 50%;
+      background: var(--cyan);
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .package-option.active .package-check {
+      display: flex;
+    }
+
+    .paste-card {
+      margin-bottom: 20px;
+    }
+
+    .paste-header-right {
+      color: var(--cyan);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .paste-content {
+      padding: 20px 24px 24px;
+    }
+
+    .paste-instruction {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 16px;
+      padding: 13px 15px;
+      background: var(--soft-blue);
+      border: 1px solid #d8f1f3;
+      border-radius: 12px;
+    }
+
+    .paste-instruction-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      flex-shrink: 0;
+      border-radius: 7px;
+      background: white;
+      color: var(--cyan);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .paste-instruction-text {
+      min-width: 0;
+    }
+
+    .paste-instruction-title {
+      margin-bottom: 2px;
+      color: var(--orange);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .paste-instruction-description {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.5;
+      font-weight: 500;
+    }
+
+    .table-wrapper {
+      width: 100%;
+      overflow: auto;
+      border: 1.8px solid var(--line);
+      border-radius: 12px;
+      background: white;
+      max-height: 520px;
+    }
+
+    table {
+      width: 100%;
+      min-width: 1200px;
+      border-collapse: separate;
+      border-spacing: 0;
+      table-layout: auto;
+      background: white;
+    }
+
+    th {
+      display: none;
+    }
+
+    th:first-child {
+      border-top-left-radius: 10px;
+    }
+
+    th:last-child {
+      border-top-right-radius: 10px;
+      border-right: none;
+    }
+
+    td {
+      padding: 9px 11px;
+      background: white;
+      color: #000000;
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      font-size: 12px;
+      line-height: 1.45;
+      min-height: 38px;
+      vertical-align: middle;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+
+    tbody tr:nth-child(even) td {
+      background: #fcfeff;
+    }
+
+    tbody tr:hover td {
+      background: #f9ffff;
+    }
+
+    td:last-child {
+      border-right: none;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    td[contenteditable="true"] {
+      cursor: text;
+    }
+
+    td[contenteditable="true"]:focus {
+      outline: 2px solid var(--cyan);
+      outline-offset: -2px;
+      background: #f7ffff !important;
+    }
+
+    th:nth-child(1),
+    td:nth-child(1) {
+      min-width: 240px;
+    }
+
+    th:nth-child(2),
+    td:nth-child(2) {
+      min-width: 300px;
+    }
+
+    th:nth-child(3),
+    td:nth-child(3),
+    th:nth-child(4),
+    td:nth-child(4),
+    th:nth-child(5),
+    td:nth-child(5),
+    th:nth-child(6),
+    td:nth-child(6),
+    th:nth-child(7),
+    td:nth-child(7),
+    th:nth-child(8),
+    td:nth-child(8),
+    th:nth-child(9),
+    td:nth-child(9),
+    th:nth-child(10),
+    td:nth-child(10) {
+      min-width: 90px;
+    }
+
+    .empty-row td {
+      height: 46px;
+      color: #000000;
+    }
+
+    .action-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    .action-note {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 10px 17px;
+      font-family: "Quicksand", sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition:
+        background 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+    }
+
+    .primary-btn {
+      background: var(--orange);
+      color: white;
+      padding: 13px 22px;
+      font-size: 13px;
+      box-shadow: 0 4px 10px rgba(255, 123, 61, 0.2);
+    }
+
+    .primary-btn:hover {
+      background: #ff905c;
+      transform: translateY(-1px);
+      box-shadow: 0 5px 12px rgba(255, 123, 61, 0.25);
+    }
+
+    .reset-btn {
+      background: white;
+      color: var(--cyan);
+      border: 2px solid var(--cyan);
+      padding: 11px 18px;
+    }
+
+    .reset-btn:hover {
+      background: var(--cyan);
+      color: white;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .message {
+      margin-top: 12px;
+      padding: 11px 13px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 700;
+      display: none;
+    }
+
+    .message.show {
+      display: block;
+    }
+
+    .message.error {
+      background: var(--red-light);
+      color: var(--red);
+      border: 1px solid #f0cccc;
+    }
+
+    .message.success {
+      background: var(--green-light);
+      color: var(--green);
+      border: 1px solid #cce6d6;
+    }
+
+    .results-card {
+      overflow: hidden;
+    }
+
+    .results-top {
+      padding: 21px 24px 22px;
+    }
+
+    .results-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .results-title-area {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .results-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      border-radius: 9px;
+      background: var(--soft-pink);
+      color: var(--orange);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .results-title {
+      margin: 0;
+      color: var(--orange);
+      font-size: 17px;
+      font-weight: 700;
+    }
+
+    .package-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 11px;
+      background: var(--soft-blue);
+      border: 1px solid #d7eeee;
+      border-radius: 999px;
+      color: var(--cyan);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .package-status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--cyan);
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 11px;
+      margin-bottom: 20px;
+    }
+
+    .summary-card {
+      position: relative;
+      padding: 16px 17px;
+      background: #fcfeff;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .summary-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 3px;
+      height: 100%;
+      background: var(--line);
+    }
+
+    .summary-card.orange-card::before {
+      background: var(--orange);
+    }
+
+    .summary-card.green-card::before {
+      background: var(--green);
+    }
+
+    .summary-card.red-card::before {
+      background: var(--red);
+    }
+
+    .summary-label {
+      margin-bottom: 6px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .summary-value {
+      color: var(--cyan);
+      font-size: 25px;
+      line-height: 1;
+      font-weight: 700;
+    }
+
+    .summary-value.orange {
+      color: var(--orange);
+    }
+
+    .summary-value.green {
+      color: var(--green);
+    }
+
+    .summary-value.red {
+      color: var(--red);
+    }
+
+    .unlimited-message {
+      display: none;
+      margin: -6px 0 16px;
+      padding: 10px 13px;
+      background: var(--green-light);
+      border: 1px solid #cce6d6;
+      border-radius: 10px;
+      color: var(--green);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .campaign-tabs-wrapper {
+      margin-top: 4px;
+    }
+
+    .campaign-tabs-label {
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .campaign-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 13px;
+    }
+
+    .campaign-tab {
+      background: white;
+      color: var(--cyan);
+      border: 1.8px solid var(--cyan);
+      border-radius: 8px;
+      padding: 8px 11px;
+      font-family: "Quicksand", sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease;
+    }
+
+    .campaign-tab:hover {
+      background: var(--soft-blue);
+      border-color: var(--cyan);
+    }
+
+    .campaign-tab.active {
+      background: var(--orange);
+      color: white;
+      border-color: var(--orange);
+    }
+
+    .campaign-results {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .campaign-result-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      padding: 12px 15px;
+      background: var(--soft-blue);
+      border-bottom: 1px solid var(--line);
+      color: var(--orange);
+      font-size: 14px;
+      font-weight: 900;
+    }
+
+    .campaign-result-header-count {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      padding: 0;
+      background: transparent;
+      border: none;
+      color: var(--orange);
+      font-size: 14px;
+      font-weight: 900;
+    }
+
+    .result-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      padding: 10px 15px;
+      background: white;
+      border-bottom: 1px solid var(--line);
+      font-size: 12px;
+    }
+
+    .result-row:last-child {
+      border-bottom: none;
+    }
+
+    .result-row:hover {
+      background: #fbffff;
+    }
+
+    .result-name {
+      min-width: 0;
+      color: var(--text);
+      font-weight: 600;
+      word-break: break-word;
+    }
+
+    .result-count {
+      flex-shrink: 0;
+      color: var(--cyan);
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .result-footer {
+      padding: 11px 15px;
+      background: #f9fbfc;
+      border-top: 1px solid var(--line);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .result-footer.available {
+      color: var(--green);
+    }
+
+    .result-footer.reached {
+      color: var(--red);
+    }
+
+    .result-footer.unlimited {
+      background: var(--green-light);
+      color: var(--green);
+    }
+
+    @media (max-width: 1000px) {
+      .package-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .subtitle {
+        white-space: normal;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .container {
+        padding: 20px 12px 35px;
+      }
+
+      h1 {
+        font-size: 28px;
+      }
+
+      .card-header,
+      .paste-content,
+      .results-top {
+        padding-left: 17px;
+        padding-right: 17px;
+      }
+
+      .package-grid {
+        grid-template-columns: 1fr 1fr;
+        padding-left: 17px;
+        padding-right: 17px;
+      }
+
+      .summary-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .action-bar {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .button-group {
+        width: 100%;
+      }
+
+      .button-group button {
+        flex: 1;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .package-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .results-header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <header class="page-header">
+    <div class="page-header-left">
+
+      <h1>
+        <span class="geofence">Geofence</span>
+        <span class="counter">Counter</span>
+      </h1>
+
+      <p class="subtitle">
+        Select your package, paste your TapClicks data, and instantly see how many geofences you are using and how many remain available.
+      </p>
+
+    </div>
+  </header>
+
+
+  <section class="card package-card">
+
+    <div class="card-header">
+
+      <div class="section-heading">
+
+        <div class="section-number">
+          1
+        </div>
+
+        <div class="section-heading-text">
+
+          <h2>
+            Select Package
+          </h2>
+
+          <p>
+            Choose the geofence limit for this campaign.
+          </p>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="package-grid">
+
+      <div
+        class="package-option"
+        data-limit="10"
+        data-package="Saver"
+      >
+
+        <div class="package-check">
+          ✓
+        </div>
+
+        <div class="package-option-content">
+
+          <div class="package-name">
+            Saver
+          </div>
+
+          <div class="package-locations">
+            10 Locations
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div
+        class="package-option active"
+        data-limit="20"
+        data-package="Standard"
+      >
+
+        <div class="package-check">
+          ✓
+        </div>
+
+        <div class="package-option-content">
+
+          <div class="package-name">
+            Standard
+          </div>
+
+          <div class="package-locations">
+            20 Locations
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div
+        class="package-option"
+        data-limit="40"
+        data-package="Premium"
+      >
+
+        <div class="package-check">
+          ✓
+        </div>
+
+        <div class="package-option-content">
+
+          <div class="package-name">
+            Premium
+          </div>
+
+          <div class="package-locations">
+            40 Locations
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div
+        class="package-option"
+        data-limit="Infinity"
+        data-package="Unlimited"
+      >
+
+        <div class="package-check">
+          ✓
+        </div>
+
+        <div class="package-option-content">
+
+          <div class="package-name">
+            Unlimited
+          </div>
+
+          <div class="package-locations">
+            40+ Locations
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <section class="card paste-card">
+
+    <div class="card-header">
+
+      <div class="section-heading">
+
+        <div class="section-number">
+          2
+        </div>
+
+        <div class="section-heading-text">
+
+          <h2>
+            Paste TapClicks Data
+          </h2>
+
+          <p>
+            Your exported data will automatically populate the table.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="paste-header-right">
+        Pipe delimited
+      </div>
+
+    </div>
+
+
+    <div class="paste-content">
+
+
+      <div class="table-wrapper">
+
+        <table id="TapClicksTable">
+
+          <thead>
+
+            <tr>
+
+              <th>
+                Geo Fence
+              </th>
+
+              <th>
+                Campaign
+              </th>
+
+              <th>
+                Impressions
+              </th>
+
+              <th>
+                CPM
+              </th>
+
+              <th>
+                Clicks
+              </th>
+
+              <th>
+                CTR
+              </th>
+
+              <th>
+                CPC
+              </th>
+
+              <th>
+                Total Cost
+              </th>
+
+              <th>
+                Walk Ins
+              </th>
+
+              <th>
+                Cost Per Walk In
+              </th>
+
+            </tr>
+
+          </thead>
+
+
+          <tbody id="topClicksBody">
+
+            <tr class="empty-row">
+
+              <td contenteditable="true"></td>
+              <td contenteditable="true"></td>
+              <td contenteditable="true"></td>
+              <td contenteditable="true"></td>
+              <td contenteditable="true"></td>
+              <td contenteditable="true"></td>
+              <td contenteditable="true"></td>
+              <td contenteditable="true"></td>
+              <td contenteditable="true"></td>
+              <td contenteditable="true"></td>
+
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+
+      <div class="action-bar">
+
+        <div class="button-group">
+
+          <button
+            type="button"
+            class="primary-btn"
+            id="calculateBtn"
+          >
+            Calculate Geofences
+          </button>
+
+
+          <button
+            type="button"
+            class="reset-btn"
+            id="resetBtn"
+          >
+            Reset
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <div
+        id="pasteMessage"
+        class="message"
+      ></div>
+
+    </div>
+
+  </section>
+
+
+  <section class="card results-card">
+
+    <div class="results-top">
+
+      <div class="results-header">
+
+        <div class="results-title-area">
+
+          <div class="results-icon">
+            #
+          </div>
+
+          <h2 class="results-title">
+            Geofence Results
+          </h2>
+
+        </div>
+
+
+        <div class="package-status">
+
+          <span class="package-status-dot"></span>
+
+          <span>
+            Package:
+          </span>
+
+          <span id="selectedPackageLabel">
+            Standard
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <div class="summary-grid">
+
+        <div class="summary-card">
+
+          <div class="summary-label">
+            Rows Entered
+          </div>
+
+          <div
+            class="summary-value"
+            id="rowsEntered"
+          >
+            0
+          </div>
+
+        </div>
+
+
+        <div class="summary-card orange-card">
+
+          <div class="summary-label">
+            Unique Geofences
+          </div>
+
+          <div
+            class="summary-value orange"
+            id="uniqueGeofences"
+          >
+            0
+          </div>
+
+        </div>
+
+
+        <div
+          class="summary-card green-card"
+          id="additionalAvailableCard"
+        >
+
+          <div class="summary-label">
+            Additional Available
+          </div>
+
+          <div
+            class="summary-value green"
+            id="additionalAvailable"
+          >
+            20
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div
+        id="unlimitedMessage"
+        class="unlimited-message"
+      >
+        Unlimited additional geofences available.
+      </div>
+
+
+      <div class="campaign-tabs-wrapper">
+
+        <div class="campaign-tabs-label">
+          Campaigns
+        </div>
+
+        <div
+          id="campaignTabs"
+          class="campaign-tabs"
+        ></div>
+
+      </div>
+
+
+      <div
+        id="campaignResults"
+        class="campaign-results"
+      >
+
+        <div class="campaign-result-header">
+
+          <span>
+            Paste your TapClicks data above to view results.
+          </span>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+</div>
+
+
+<script>
+
+  let selectedPackage = "Standard";
+  let selectedLimit = 20;
+
+  let parsedRows = [];
+  let campaignGroups = {};
+  let activeCampaign = null;
+
+
+  const topClicksTable =
+    document.getElementById(
+      "topClicksTable"
+    );
+
+
+  const topClicksBody =
+    document.getElementById(
+      "topClicksBody"
+    );
+
+
+  /* =========================================================
+     TEXT CLEANING
+     ========================================================= */
+
+  function normalizeField(value) {
+
+    return String(value ?? "")
+      .replace(/\u00A0/g, " ")
+      .replace(/[\t\r\n]+/g, " ")
+      .replace(/ {2,}/g, " ")
+      .trim();
+
+  }
+
+
+  function cleanDisplayName(name) {
+
+    return normalizeField(name);
+
+  }
+
+
+  function cleanGeofenceName(name) {
+
+    let value =
+      normalizeField(name)
+        .toLowerCase();
+
+    value =
+      value
+        .replace(/[_-]+/g, " ")
+        .replace(/[^\w\s]/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+
+    value =
+      value.replace(
+        /\bleasing\s+office\b/g,
+        ""
+      );
+
+    value =
+      value.replace(
+        /\bleasing\b/g,
+        ""
+      );
+
+    value =
+      value.replace(
+        /\bresidents?\b/g,
+        ""
+      );
+
+    value =
+      value.replace(
+        /\bresidences?\b/g,
+        ""
+      );
+
+    value =
+      value.replace(
+        /\s+\d+\s*$/g,
+        ""
+      );
+
+    return value
+      .replace(/\s+/g, " ")
+      .trim();
+
+  }
+
+
+  /* =========================================================
+     TAPCLICKS PARSER
+     ========================================================= */
+
+  function parseTapClicksPipeRow(line) {
+
+    const rawFields =
+      line.split("|");
+
+    let fields =
+      rawFields.map(field =>
+        normalizeField(field)
+      );
+
+    if (
+      fields.length > 0 &&
+      fields[0] === ""
+    ) {
+      fields.shift();
+    }
+
+    if (
+      fields.length > 0 &&
+      fields[fields.length - 1] === ""
+    ) {
+      fields.pop();
+    }
+
+    fields =
+      fields.map(field =>
+        normalizeField(field)
+      );
+
+    return fields;
+
+  }
+
+
+  function isSeparatorRow(fields) {
+
+    if (!fields.length) {
+      return true;
+    }
+
+    return fields.every(field => {
+
+      const value =
+        String(field || "")
+          .replace(/\s/g, "");
+
+      return (
+        value === "" ||
+        /^:?-+:?$/.test(value)
+      );
+
+    });
+
+  }
+
+
+  function isExcelExtraColumn(fields) {
+
+    if (fields.length < 11) {
+      return false;
+    }
+
+    const possibleGeoFence =
+      normalizeField(
+        fields[1]
+      );
+
+    const possibleCampaign =
+      normalizeField(
+        fields[2]
+      );
+
+    const possibleImpressions =
+      normalizeField(
+        fields[3]
+      );
+
+    if (
+      !possibleGeoFence ||
+      !possibleCampaign
+    ) {
+      return false;
+    }
+
+    const impressionValue =
+      possibleImpressions
+        .replace(/,/g, "")
+        .trim();
+
+    return (
+      /^\d+(?:\.\d+)?$/.test(
+        impressionValue
+      )
+    );
+
+  }
+
+
+  function parseEntireClipboard(text) {
+
+    if (
+      !text ||
+      !text.trim()
+    ) {
+      return [];
+    }
+
+    const lines =
+      text
+        .replace(/\r\n/g, "\n")
+        .replace(/\r/g, "\n")
+        .split("\n")
+        .filter(line =>
+          line.trim() !== ""
+        );
+
+    const rows = [];
+
+    for (const line of lines) {
+
+      if (!line.includes("|")) {
+        continue;
+      }
+
+      let fields =
+        parseTopClicksPipeRow(line);
+
+      if (!fields.length) {
+        continue;
+      }
+
+      if (
+        isSeparatorRow(fields)
+      ) {
+        continue;
+      }
+
+      if (
+        isExcelExtraColumn(fields)
+      ) {
+
+        fields =
+          fields.slice(1);
+
+      }
+
+      if (!fields.length) {
+        continue;
+      }
+
+      const first =
+        normalizeField(fields[0])
+          .toLowerCase();
+
+      if (
+        first === "geo fence" ||
+        first === "geofence"
+      ) {
+        continue;
+      }
+
+      if (fields.length < 2) {
+        continue;
+      }
+
+      rows.push({
+
+        geoFence:
+          normalizeField(
+            fields[0]
+          ),
+
+        campaign:
+          normalizeField(
+            fields[1]
+          ),
+
+        impressions:
+          normalizeField(
+            fields[2] || ""
+          ),
+
+        cpm:
+          normalizeField(
+            fields[3] || ""
+          ),
+
+        clicks:
+          normalizeField(
+            fields[4] || ""
+          ),
+
+        ctr:
+          normalizeField(
+            fields[5] || ""
+          ),
+
+        cpc:
+          normalizeField(
+            fields[6] || ""
+          ),
+
+        totalCost:
+          normalizeField(
+            fields[7] || ""
+          ),
+
+        walkIns:
+          normalizeField(
+            fields[8] || ""
+          ),
+
+        costPerWalkIn:
+          normalizeField(
+            fields[9] || ""
+          )
+
+      });
+
+    }
+
+    return rows;
+
+  }
+
+
+  /* =========================================================
+     PASTE HANDLING
+     ========================================================= */
+
+  function populateTableFromPaste(text) {
+
+    const rows =
+      parseEntireClipboard(text);
+
+    if (!rows.length) {
+
+      showMessage(
+        "No usable TapClicks rows were found in the pasted data.",
+        "error"
+      );
+
+      return;
+
+    }
+
+    parsedRows = rows;
+
+    topClicksBody.innerHTML = "";
+
+    rows.forEach(row => {
+
+      const tr =
+        document.createElement("tr");
+
+      const values = [
+
+        cleanDisplayName(
+          row.geoFence
+        ),
+
+        cleanDisplayName(
+          row.campaign
+        ),
+
+        row.impressions,
+
+        row.cpm,
+
+        row.clicks,
+
+        row.ctr,
+
+        row.cpc,
+
+        row.totalCost,
+
+        row.walkIns,
+
+        row.costPerWalkIn
+
+      ];
+
+      values.forEach(value => {
+
+        const td =
+          document.createElement("td");
+
+        td.contentEditable =
+          "true";
+
+        td.textContent =
+          normalizeField(value);
+
+        tr.appendChild(td);
+
+      });
+
+      topClicksBody.appendChild(tr);
+
+    });
+
+    showMessage(
+      `${rows.length} rows pasted successfully.`,
+      "success"
+    );
+
+    calculateResults();
+
+  }
+
+
+  document.addEventListener(
+    "paste",
+    function(event) {
+
+      const clipboard =
+        event.clipboardData;
+
+      if (!clipboard) {
+        return;
+      }
+
+      const text =
+        clipboard.getData(
+          "text/plain"
+        );
+
+      if (
+        !text ||
+        !text.trim()
+      ) {
+        return;
+      }
+
+      if (!text.includes("|")) {
+        return;
+      }
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      populateTableFromPaste(text);
+
+    },
+    true
+  );
+
+
+  /* =========================================================
+     READ TABLE
+     ========================================================= */
+
+  function readTableRows() {
+
+    const rows = [];
+
+    const trs =
+      Array.from(
+        topClicksBody.querySelectorAll(
+          "tr"
+        )
+      );
+
+    trs.forEach(tr => {
+
+      const cells =
+        Array.from(
+          tr.querySelectorAll(
+            "td"
+          )
+        );
+
+      if (cells.length !== 10) {
+        return;
+      }
+
+      const values =
+        cells.map(cell =>
+          normalizeField(
+            cell.textContent
+          )
+        );
+
+      if (
+        !values[0] ||
+        !values[1]
+      ) {
+        return;
+      }
+
+      rows.push({
+
+        geoFence:
+          values[0],
+
+        campaign:
+          values[1],
+
+        impressions:
+          values[2],
+
+        cpm:
+          values[3],
+
+        clicks:
+          values[4],
+
+        ctr:
+          values[5],
+
+        cpc:
+          values[6],
+
+        totalCost:
+          values[7],
+
+        walkIns:
+          values[8],
+
+        costPerWalkIn:
+          values[9]
+
+      });
+
+    });
+
+    return rows;
+
+  }
+
+
+  /* =========================================================
+     CAMPAIGN LOGIC
+     ========================================================= */
+
+  function getParentCampaign(campaign) {
+
+    const value =
+      normalizeField(
+        campaign
+      );
+
+    const suffixes = [
+      "_Competitor-Resident",
+      "_Employer-POI"
+    ];
+
+    for (
+      const suffix of suffixes
+    ) {
+
+      const index =
+        value.indexOf(
+          suffix
+        );
+
+      if (index !== -1) {
+
+        return value.substring(
+          0,
+          index +
+          suffix.length
+        );
+
+      }
+
+    }
+
+    return value;
+
+  }
+
+
+  function isIsolationCampaign(
+    campaign
+  ) {
+
+    const parent =
+      getParentCampaign(
+        campaign
+      );
+
+    return (
+      campaign !== parent &&
+      campaign.startsWith(
+        parent + "_"
+      )
+    );
+
+  }
+
+
+  function getUniqueGeofences(
+    rows
+  ) {
+
+    const map =
+      new Map();
+
+    rows.forEach(row => {
+
+      const displayName =
+        cleanDisplayName(
+          row.geoFence
+        );
+
+const key =
+  cleanGeofenceName(
+    displayName
+  );
+
+if (
+  !key ||
+  displayName.trim().toLowerCase() === "unknown"
+) {
+  return;
+}
+
+      if (!map.has(key)) {
+
+        map.set(
+          key,
+          {
+            key: key,
+            displayName:
+              displayName,
+            rows: [row]
+          }
+        );
+
+      } else {
+
+        map
+          .get(key)
+          .rows
+          .push(row);
+
+      }
+
+    });
+
+    return map;
+
+  }
+
+
+  function buildCampaignGroups(
+    rows
+  ) {
+
+    const groups = {};
+
+    rows.forEach(row => {
+
+      const campaign =
+        cleanDisplayName(
+          row.campaign
+        );
+
+      if (!campaign) {
+        return;
+      }
+
+      const parent =
+        getParentCampaign(
+          campaign
+        );
+
+      if (!groups[parent]) {
+
+        groups[parent] = {
+
+          campaign:
+            parent,
+
+          rows: [],
+
+          isolatedRows: [],
+
+          allRows: []
+
+        };
+
+      }
+
+      if (
+        isIsolationCampaign(
+          campaign
+        )
+      ) {
+
+        groups[parent]
+          .isolatedRows
+          .push(row);
+
+      } else {
+
+        groups[parent]
+          .rows
+          .push(row);
+
+      }
+
+    });
+
+    Object.values(
+      groups
+    ).forEach(group => {
+
+      group.allRows = [
+        ...group.rows,
+        ...group.isolatedRows
+      ];
+
+    });
+
+    return groups;
+
+  }
+
+
+  function getCampaignUniqueGeofences(
+    group
+  ) {
+
+    const map =
+      new Map();
+
+    group.allRows.forEach(
+      row => {
+
+        const displayName =
+          cleanDisplayName(
+            row.geoFence
+          );
+
+const key =
+  cleanGeofenceName(
+    displayName
+  );
+
+if (
+  !key ||
+  displayName.trim().toLowerCase() === "unknown"
+) {
+  return;
+}
+if (
+  /(^|_)Event(_|$)/i.test(
+    displayName
+  )
+) {
+  return;
+}
+
+        if (!map.has(key)) {
+
+          map.set(
+            key,
+            {
+              key: key,
+              displayName:
+                displayName
+            }
+          );
+
+        }
+
+      }
+    );
+
+    return map;
+
+  }
+
+
+  /* =========================================================
+     CALCULATE
+     ========================================================= */
+
+  function calculateResults() {
+
+    const tableRows =
+      readTableRows();
+
+    if (tableRows.length) {
+      parsedRows =
+        tableRows;
+    }
+
+    if (!parsedRows.length) {
+
+      showMessage(
+        "Please paste your TapClicks data first.",
+        "error"
+      );
+
+      return;
+
+    }
+
+    campaignGroups =
+      buildCampaignGroups(
+        parsedRows
+      );
+
+    updateSummary();
+    renderCampaignTabs();
+    renderCampaignResults();
+
+  }
+
+
+  /* =========================================================
+     SUMMARY
+     ========================================================= */
+
+  function updateSummary() {
+
+    const unique =
+      getUniqueGeofences(
+        parsedRows
+      );
+
+    document.getElementById(
+      "rowsEntered"
+    ).textContent =
+      parsedRows.length;
+
+    document.getElementById(
+      "uniqueGeofences"
+    ).textContent =
+      unique.size;
+
+    const additional =
+      document.getElementById(
+        "additionalAvailable"
+      );
+
+    const additionalCard =
+      document.getElementById(
+        "additionalAvailableCard"
+      );
+
+    const unlimited =
+      document.getElementById(
+        "unlimitedMessage"
+      );
+
+    if (
+      selectedLimit === Infinity
+    ) {
+
+      additional.textContent =
+        "∞";
+
+      additional.className =
+        "summary-value green";
+
+      additionalCard.classList.remove(
+        "red-card"
+      );
+
+      additionalCard.classList.add(
+        "green-card"
+      );
+
+      unlimited.style.display =
+        "block";
+
+    } else {
+
+      const available =
+        selectedLimit -
+        unique.size;
+
+      additional.textContent =
+        available;
+
+      if (available < 0) {
+
+        additional.className =
+          "summary-value red";
+
+        additionalCard.classList.remove(
+          "green-card"
+        );
+
+        additionalCard.classList.add(
+          "red-card"
+        );
+
+      } else {
+
+        additional.className =
+          "summary-value green";
+
+        additionalCard.classList.remove(
+          "red-card"
+        );
+
+        additionalCard.classList.add(
+          "green-card"
+        );
+
+      }
+
+      unlimited.style.display =
+        "none";
+
+    }
+
+  }
+
+
+  /* =========================================================
+     CAMPAIGN TABS
+     ========================================================= */
+
+  function renderCampaignTabs() {
+
+    const tabs =
+      document.getElementById(
+        "campaignTabs"
+      );
+
+    tabs.innerHTML = "";
+
+    const campaigns =
+      Object.keys(
+        campaignGroups
+      );
+
+    if (!campaigns.length) {
+      return;
+    }
+
+    if (
+      !activeCampaign ||
+      !campaignGroups[
+        activeCampaign
+      ]
+    ) {
+
+      activeCampaign =
+        campaigns[0];
+
+    }
+
+    campaigns.forEach(
+      campaign => {
+
+        const button =
+          document.createElement(
+            "button"
+          );
+
+        button.type =
+          "button";
+
+        button.className =
+          "campaign-tab" +
+          (
+            campaign ===
+            activeCampaign
+              ? " active"
+              : ""
+          );
+
+        button.textContent =
+          campaign;
+
+        button.addEventListener(
+          "click",
+          () => {
+
+            activeCampaign =
+              campaign;
+
+            renderCampaignTabs();
+            renderCampaignResults();
+
+          }
+        );
+
+        tabs.appendChild(
+          button
+        );
+
+      }
+    );
+
+  }
+
+
+  /* =========================================================
+     CAMPAIGN RESULTS
+     ========================================================= */
+
+  function renderCampaignResults() {
+
+    const container =
+      document.getElementById(
+        "campaignResults"
+      );
+
+    if (!parsedRows.length) {
+
+      container.innerHTML = `
+
+        <div class="campaign-result-header">
+
+          <span>
+            Paste your TapClicks data above to view results.
+          </span>
+
+        </div>
+
+      `;
+
+      return;
+
+    }
+
+    const campaigns =
+      Object.keys(
+        campaignGroups
+      );
+
+    if (!campaigns.length) {
+
+      container.innerHTML = `
+
+        <div class="campaign-result-header">
+
+          <span>
+            No campaigns found.
+          </span>
+
+        </div>
+
+      `;
+
+      return;
+
+    }
+
+    if (!activeCampaign) {
+
+      activeCampaign =
+        campaigns[0];
+
+    }
+
+    const group =
+      campaignGroups[
+        activeCampaign
+      ];
+
+    if (!group) {
+      return;
+    }
+
+    const unique =
+      getCampaignUniqueGeofences(
+        group
+      );
+
+    const names =
+      Array.from(
+        unique.values()
+      );
+
+    let html = `
+
+      <div class="campaign-result-header">
+
+        <span>
+          ${escapeHtml(
+            activeCampaign
+          )}
+        </span>
+
+        <span class="campaign-result-header-count">
+
+          ${names.length}
+          ${
+            names.length === 1
+              ? "geofence"
+              : "geofences"
+          }
+
+        </span>
+
+      </div>
+
+    `;
+
+    if (!names.length) {
+
+      html += `
+
+        <div class="result-row">
+
+          <div class="result-name">
+            No geofences found.
+          </div>
+
+        </div>
+
+      `;
+
+    } else {
+
+      names.forEach(
+        item => {
+
+          html += `
+
+            <div class="result-row">
+
+              <div class="result-name">
+
+                ${escapeHtml(
+                  item.displayName
+                )}
+
+              </div>
+
+              <div class="result-count">
+                Counted once
+              </div>
+
+            </div>
+
+          `;
+
+        }
+      );
+
+    }
+
+    container.innerHTML =
+      html;
+
+  }
+
+
+  /* =========================================================
+     ESCAPE HTML
+     ========================================================= */
+
+  function escapeHtml(value) {
+
+    return String(
+      value || ""
+    )
+      .replace(
+        /&/g,
+        "&amp;"
+      )
+      .replace(
+        /</g,
+        "&lt;"
+      )
+      .replace(
+        />/g,
+        "&gt;"
+      )
+      .replace(
+        /"/g,
+        "&quot;"
+      )
+      .replace(
+        /'/g,
+        "&#039;"
+      );
+
+  }
+
+
+  /* =========================================================
+     MESSAGE
+     ========================================================= */
+
+  function showMessage(
+    text,
+    type
+  ) {
+
+    const message =
+      document.getElementById(
+        "pasteMessage"
+      );
+
+    message.textContent =
+      text;
+
+    message.className =
+      `message show ${type}`;
+
+    clearTimeout(
+      showMessage.timer
+    );
+
+    showMessage.timer =
+      setTimeout(
+        () => {
+
+          message.className =
+            "message";
+
+        },
+        3500
+      );
+
+  }
+
+
+  /* =========================================================
+     PACKAGE SELECTION
+     ========================================================= */
+
+  document
+    .querySelectorAll(
+      ".package-option"
+    )
+    .forEach(card => {
+
+      card.addEventListener(
+        "click",
+        () => {
+
+          document
+            .querySelectorAll(
+              ".package-option"
+            )
+            .forEach(item =>
+              item.classList.remove(
+                "active"
+              )
+            );
+
+          card.classList.add(
+            "active"
+          );
+
+          selectedPackage =
+            card.dataset.package;
+
+          selectedLimit =
+            card.dataset.limit ===
+            "Infinity"
+              ? Infinity
+              : Number(
+                  card.dataset.limit
+                );
+
+          document.getElementById(
+            "selectedPackageLabel"
+          ).textContent =
+            selectedPackage;
+
+          updateSummary();
+          renderCampaignResults();
+
+        }
+      );
+
+    });
+
+
+  /* =========================================================
+     BUTTONS
+     ========================================================= */
+
+  document
+    .getElementById(
+      "calculateBtn"
+    )
+    .addEventListener(
+      "click",
+      calculateResults
+    );
+
+
+  document
+    .getElementById(
+      "resetBtn"
+    )
+    .addEventListener(
+      "click",
+      () => {
+
+        parsedRows = [];
+
+        campaignGroups = {};
+
+        activeCampaign = null;
+
+        topClicksBody.innerHTML = `
+
+          <tr class="empty-row">
+
+            <td contenteditable="true"></td>
+            <td contenteditable="true"></td>
+            <td contenteditable="true"></td>
+            <td contenteditable="true"></td>
+            <td contenteditable="true"></td>
+            <td contenteditable="true"></td>
+            <td contenteditable="true"></td>
+            <td contenteditable="true"></td>
+            <td contenteditable="true"></td>
+            <td contenteditable="true"></td>
+
+          </tr>
+
+        `;
+
+
+        document.getElementById(
+          "rowsEntered"
+        ).textContent =
+          "0";
+
+
+        document.getElementById(
+          "uniqueGeofences"
+        ).textContent =
+          "0";
+
+
+        document.getElementById(
+          "additionalAvailable"
+        ).textContent =
+          selectedLimit === Infinity
+            ? "∞"
+            : selectedLimit;
+
+
+        document.getElementById(
+          "additionalAvailable"
+        ).className =
+          "summary-value green";
+
+
+        document.getElementById(
+          "additionalAvailableCard"
+        ).classList.remove(
+          "red-card"
+        );
+
+
+        document.getElementById(
+          "additionalAvailableCard"
+        ).classList.add(
+          "green-card"
+        );
+
+
+        document.getElementById(
+          "campaignTabs"
+        ).innerHTML =
+          "";
+
+
+        document.getElementById(
+          "campaignResults"
+        ).innerHTML = `
+
+          <div class="campaign-result-header">
+
+            <span>
+              Paste your TapClicks data above to view results.
+            </span>
+
+          </div>
+
+        `;
+
+
+        document.getElementById(
+          "unlimitedMessage"
+        ).style.display =
+          selectedLimit === Infinity
+            ? "block"
+            : "none";
+
+
+        document.getElementById(
+          "pasteMessage"
+        ).className =
+          "message";
+
+      }
+    );
+
+
+  /* =========================================================
+     INITIAL STATE
+     ========================================================= */
+
+  updateSummary();
+
+</script>
+
+</body>
+</html>
+  </template>
+
+
+  <!-- =========================================================
+       TAB LOGIC
+       ========================================================= -->
+
+  <script>
+    function showTool(toolId, button) {
+      document.querySelectorAll('.tool-panel').forEach(panel => {
+        panel.classList.remove('active');
+      });
+
+      document.querySelectorAll('.tab-button').forEach(tab => {
+        tab.classList.remove('active');
+      });
+
+      const panel = document.getElementById(toolId);
+
+      if (panel) {
+        panel.classList.add('active');
+      }
+
+      if (button) {
+        button.classList.add('active');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      const calcitoTemplate = document.getElementById('calcitoTemplate');
+      const eventCampaignTemplate = document.getElementById('eventCampaignToolTemplate');
+      const pixelCheckerTemplate = document.getElementById('pixel-checkerTemplate');
+      const geofenceTemplate = document.getElementById('geofenceCounterTemplate');
+
+      const calcitoFrame = document.getElementById('calcitoFrame');
+      const eventConverterFrame = document.getElementById('eventConverterFrame');
+      const pixelCheckerFrame = document.getElementById('pixelCheckerFrame');
+      const geofenceCounterFrame = document.getElementById('geofenceCounterFrame');
+
+      if (calcitoTemplate && calcitoFrame) {
+        calcitoFrame.srcdoc = calcitoTemplate.innerHTML;
+      }
+
+      if (eventCampaignTemplate && eventConverterFrame) {
+        eventConverterFrame.srcdoc = eventCampaignTemplate.innerHTML;
+      }
+
+      if (pixelCheckerTemplate && pixelCheckerFrame) {
+        pixelCheckerFrame.srcdoc = pixelCheckerTemplate.innerHTML;
+      }
+
+      if (geofenceTemplate && geofenceCounterFrame) {
+        geofenceCounterFrame.srcdoc = geofenceTemplate.innerHTML;
+      }
+    });
+  </script>
+
+</body>
+</html>
